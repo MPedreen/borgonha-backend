@@ -140,10 +140,10 @@ movimentacoes_estoque (
 ## Autenticação e Autorização (Keycloak)
 
 ### Roles
-| Role Keycloak | Persona | Permissões |
-|---------------|---------|------------|
-| `admin` | Bruna (proprietária) | Tudo: CRUD produtos, ingredientes, relatórios, vendas |
-| `atendente` | Laura | `GET /produtos`, `POST /vendas` apenas |
+| Role Keycloak | Permissões |
+|---------------|------------|
+| `admin` | Tudo: CRUD produtos, ingredientes, relatórios, vendas |
+| `atendente` | `GET /produtos`, `POST /vendas` apenas |
 
 ### Configuração
 ```csharp

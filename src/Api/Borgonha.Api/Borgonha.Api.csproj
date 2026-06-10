@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\Pdv\Pdv.Presentation\Pdv.Presentation.csproj" />
+    <ProjectReference Include="..\..\Modules\Produtos\Produtos.Presentation\Produtos.Presentation.csproj" />
+    <ProjectReference Include="..\..\Modules\Estoque\Estoque.Presentation\Estoque.Presentation.csproj" />
+    <ProjectReference Include="..\..\Shared\Borgonha.CQRS\Borgonha.CQRS.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>

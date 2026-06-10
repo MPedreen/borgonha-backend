@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Pdv.Domain\Pdv.Domain.csproj" />
+    <ProjectReference Include="..\..\Produtos\Produtos.Domain\Produtos.Domain.csproj" />
+    <ProjectReference Include="..\..\Estoque\Estoque.Domain\Estoque.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Borgonha.CQRS\Borgonha.CQRS.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
