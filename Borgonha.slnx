@@ -1,29 +1,8 @@
 <Solution>
-  <Folder Name="/src/" />
-  <Folder Name="/src/Api/">
-    <Project Path="src/Api/Borgonha.Api/Borgonha.Api.csproj" />
-  </Folder>
-  <Folder Name="/src/Modules/" />
-  <Folder Name="/src/Modules/Estoque/">
-    <Project Path="src/Modules/Estoque/Estoque.Application/Estoque.Application.csproj" />
-    <Project Path="src/Modules/Estoque/Estoque.Domain/Estoque.Domain.csproj" />
-    <Project Path="src/Modules/Estoque/Estoque.Infrastructure/Estoque.Infrastructure.csproj" />
-    <Project Path="src/Modules/Estoque/Estoque.Presentation/Estoque.Presentation.csproj" />
-  </Folder>
-  <Folder Name="/src/Modules/Pdv/">
-    <Project Path="src/Modules/Pdv/Pdv.Application/Pdv.Application.csproj" />
-    <Project Path="src/Modules/Pdv/Pdv.Domain/Pdv.Domain.csproj" />
-    <Project Path="src/Modules/Pdv/Pdv.Infrastructure/Pdv.Infrastructure.csproj" />
-    <Project Path="src/Modules/Pdv/Pdv.Presentation/Pdv.Presentation.csproj" />
-  </Folder>
-  <Folder Name="/src/Modules/Produtos/">
-    <Project Path="src/Modules/Produtos/Produtos.Application/Produtos.Application.csproj" />
-    <Project Path="src/Modules/Produtos/Produtos.Domain/Produtos.Domain.csproj" />
-    <Project Path="src/Modules/Produtos/Produtos.Infrastructure/Produtos.Infrastructure.csproj" />
-    <Project Path="src/Modules/Produtos/Produtos.Presentation/Produtos.Presentation.csproj" />
-  </Folder>
-  <Folder Name="/src/Shared/">
-    <Project Path="src/Shared/Borgonha.CQRS/Borgonha.CQRS.csproj" />
-    <Project Path="src/Shared/Borgonha.Shared/Borgonha.Shared.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/Borgonha.Api/Borgonha.Api.csproj" />
+    <Project Path="src/Borgonha.Domain/Borgonha.Domain.csproj" />
+    <Project Path="src/Borgonha.Service/Borgonha.Service.csproj" />
+    <Project Path="src/Borgonha.Infrastructure/Borgonha.Infrastructure.csproj" />
   </Folder>
 </Solution>

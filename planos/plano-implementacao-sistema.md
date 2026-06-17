@@ -22,19 +22,19 @@ Sistema de gestão da Borgonha Confeitaria: PDV, estoque e relatórios financeir
 ```
 borgonha-backend/
 ├── src/
-│   ├── Api/                        # Controllers, Program.cs, middleware
-│   ├── Application/                # Services, DTOs, interfaces
-│   ├── Domain/                     # Entidades, enums, regras de negócio puras
-│   └── Infrastructure/
+│   ├── Borgonha.Api/                # Controllers, Program.cs, middleware
+│   ├── Borgonha.Domain/              # Entidades, enums, regras de negócio puras, Result Pattern
+│   ├── Borgonha.Service/             # Services de aplicação, DTOs
+│   └── Borgonha.Infrastructure/
 │       ├── Persistence/
-│       │   ├── EfCore/             # DbContext, migrations, configs de mapeamento
-│       │   └── Dapper/             # Queries SQL, connection factory
-│       └── Auth/                   # Keycloak JWT validation setup
+│       │   ├── BorgonhaDbContext.cs # DbContext único, migrations, configs de mapeamento
+│       │   └── Dapper/              # Queries SQL, connection factory
+│       └── Auth/                    # Keycloak JWT validation setup
 ├── docker-compose.yml
 └── .env.example
 ```
 
-**Fluxo por camada:** `Controller → Service → Repository (EF Core ou Dapper)`
+**Fluxo por camada:** `Controller (Api) → Service → Repository (EF Core ou Dapper, em Infrastructure)`. Decisão de arquitetura registrada em `borgonha-vault/04-adrs/adr-005-simplificacao-arquitetura-camadas.md`.
 
 ---
 
