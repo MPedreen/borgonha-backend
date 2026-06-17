@@ -29,6 +29,13 @@ builder.Services
         options.Audience = builder.Configuration["Keycloak:Audience"];
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters.NameClaimType = "preferred_username";
+
+        // Em Docker, o backend descobre os metadados via hostname interno (keycloak:8080),
+        // mas o iss do token usa o hostname público (localhost:8080, via KC_HOSTNAME).
+        // MetadataAddress permite separar a URL de discovery da URL de validação do issuer.
+        var metadataAddress = builder.Configuration["Keycloak:MetadataAddress"];
+        if (!string.IsNullOrEmpty(metadataAddress))
+            options.MetadataAddress = metadataAddress;
     });
 
 builder.Services.AddAuthorization(options =>
