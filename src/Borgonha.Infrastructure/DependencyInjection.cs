@@ -1,4 +1,5 @@
 using Borgonha.Domain.Repositories;
+using Borgonha.Infrastructure.Dapper;
 using Borgonha.Infrastructure.Persistence;
 using Borgonha.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,9 @@ public static class DependencyInjection
         services.AddScoped<IProdutoRepository, ProdutoRepository>();
         services.AddScoped<IIngredienteRepository, IngredienteRepository>();
         services.AddScoped<IVendaRepository, VendaRepository>();
+
+        services.AddSingleton<ConnectionFactory>();
+        services.AddScoped<IRelatorioRepository, RelatorioRepository>();
 
         return services;
     }
