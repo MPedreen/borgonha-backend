@@ -5,4 +5,7 @@
     <Project Path="src/Borgonha.Service/Borgonha.Service.csproj" />
     <Project Path="src/Borgonha.Infrastructure/Borgonha.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Borgonha.IntegrationTests/Borgonha.IntegrationTests.csproj" />
+  </Folder>
 </Solution>

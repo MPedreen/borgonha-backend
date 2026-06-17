@@ -24,8 +24,10 @@ internal sealed class RelatorioRepository(ConnectionFactory connectionFactory) :
             WHERE v.data_hora::date = @Data
             """;
 
+        // Dapper não suporta DateOnly nativamente — converte para DateTime (Kind=Unspecified → timestamp without time zone no Npgsql)
+        var dataParam = new DateTime(data.Year, data.Month, data.Day);
         using var conn = connectionFactory.Criar();
-        var row = await conn.QuerySingleAsync<DapperKpis>(sql, new { Data = data.ToDateTime(TimeOnly.MinValue) });
+        var row = await conn.QuerySingleAsync<DapperKpis>(sql, new { Data = dataParam });
         return new RelatorioDiario((int)row.TotalVendas, row.ReceitaBruta, row.CustoTotal, row.Lucro);
     }
 
@@ -110,7 +112,28 @@ internal sealed class RelatorioRepository(ConnectionFactory connectionFactory) :
         return new PaginaMovimentacoes(total, pagina, tamanho, itens);
     }
 
-    private sealed record DapperKpis(long TotalVendas, decimal ReceitaBruta, decimal CustoTotal, decimal Lucro);
-    private sealed record DapperRanking(string Nome, long UnidadesVendidas, decimal Receita);
-    private sealed record DapperMovimentacao(Guid Id, string Tipo, decimal Quantidade, DateTime DataHora, Guid? VendaId, string? Observacao);
+    private sealed class DapperKpis
+    {
+        public long TotalVendas { get; set; }
+        public decimal ReceitaBruta { get; set; }
+        public decimal CustoTotal { get; set; }
+        public decimal Lucro { get; set; }
+    }
+
+    private sealed class DapperRanking
+    {
+        public string Nome { get; set; } = "";
+        public long UnidadesVendidas { get; set; }
+        public decimal Receita { get; set; }
+    }
+
+    private sealed class DapperMovimentacao
+    {
+        public Guid Id { get; set; }
+        public string Tipo { get; set; } = "";
+        public decimal Quantidade { get; set; }
+        public DateTime DataHora { get; set; }
+        public Guid? VendaId { get; set; }
+        public string? Observacao { get; set; }
+    }
 }
