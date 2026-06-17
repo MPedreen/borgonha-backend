@@ -1,3 +1,4 @@
+using Borgonha.Domain.Enums;
 using Borgonha.Domain.Models;
 using Borgonha.Domain.Repositories;
 using Borgonha.Infrastructure.Dapper;
@@ -71,6 +72,45 @@ internal sealed class RelatorioRepository(ConnectionFactory connectionFactory) :
             ranking.Select(r => new RankingProduto(r.Nome, (int)r.UnidadesVendidas, r.Receita)).ToList());
     }
 
+    public async Task<PaginaMovimentacoes> ObterMovimentacoesAsync(Guid ingredienteId, int pagina, int tamanho, CancellationToken cancellationToken = default)
+    {
+        const string sqlTotal = """
+            SELECT COUNT(*) FROM movimentacoes_estoque WHERE ingrediente_id = @IngredienteId
+            """;
+
+        const string sqlItens = """
+            SELECT
+                id          AS Id,
+                tipo        AS Tipo,
+                quantidade  AS Quantidade,
+                data_hora   AS DataHora,
+                venda_id    AS VendaId,
+                observacao  AS Observacao
+            FROM movimentacoes_estoque
+            WHERE ingrediente_id = @IngredienteId
+            ORDER BY data_hora DESC
+            LIMIT @Tamanho OFFSET @Offset
+            """;
+
+        var offset = (pagina - 1) * tamanho;
+        var param = new { IngredienteId = ingredienteId, Tamanho = tamanho, Offset = offset };
+
+        using var conn = connectionFactory.Criar();
+        var total = await conn.ExecuteScalarAsync<int>(sqlTotal, new { IngredienteId = ingredienteId });
+        var rows = (await conn.QueryAsync<DapperMovimentacao>(sqlItens, param)).ToList();
+
+        var itens = rows.Select(r => new MovimentacaoItem(
+            r.Id,
+            Enum.Parse<TipoMovimentacao>(r.Tipo, ignoreCase: true),
+            r.Quantidade,
+            r.DataHora,
+            r.VendaId,
+            r.Observacao)).ToList();
+
+        return new PaginaMovimentacoes(total, pagina, tamanho, itens);
+    }
+
     private sealed record DapperKpis(long TotalVendas, decimal ReceitaBruta, decimal CustoTotal, decimal Lucro);
     private sealed record DapperRanking(string Nome, long UnidadesVendidas, decimal Receita);
+    private sealed record DapperMovimentacao(Guid Id, string Tipo, decimal Quantidade, DateTime DataHora, Guid? VendaId, string? Observacao);
 }

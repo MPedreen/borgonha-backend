@@ -7,4 +7,5 @@ public interface IRelatorioService
 {
     Task<Result<RelatorioDiario>> ObterDiarioAsync(DateOnly data, CancellationToken cancellationToken = default);
     Task<Result<RelatorioMensal>> ObterMensalAsync(int ano, int mes, CancellationToken cancellationToken = default);
+    Task<Result<PaginaMovimentacoes>> ObterMovimentacoesAsync(Guid ingredienteId, int pagina, int tamanho, CancellationToken cancellationToken = default);
 }
