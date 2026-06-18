@@ -2,6 +2,7 @@ using Borgonha.Api.Authentication;
 using Borgonha.Api.Json;
 using Borgonha.Infrastructure;
 using Borgonha.Service;
+using Borgonha.Service.Usuarios;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplicationServices();
+
+builder.Services.AddHttpClient<IUsuarioService, UsuarioService>();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {

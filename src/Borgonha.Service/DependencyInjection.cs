@@ -15,6 +15,8 @@ public static class DependencyInjection
         services.AddScoped<IVendaService, VendaService>();
         services.AddScoped<IRelatorioService, RelatorioService>();
 
+        // UsuarioService é registrado via AddHttpClient<> em Program.cs (requer HttpClient injetado)
+
         return services;
     }
 }
