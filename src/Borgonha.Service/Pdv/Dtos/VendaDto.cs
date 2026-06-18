@@ -9,4 +9,4 @@ public sealed record VendaDto(
     DateTime DataHora,
     IReadOnlyCollection<ItemVendaDto> Itens);
 
-public sealed record ItemVendaDto(Guid ProdutoId, int Quantidade, decimal PrecoUnitario, decimal Subtotal);
+public sealed record ItemVendaDto(Guid ProdutoId, string NomeProduto, int Quantidade, decimal PrecoUnitario, decimal Subtotal);

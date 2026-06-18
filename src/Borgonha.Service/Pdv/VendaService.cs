@@ -71,7 +71,8 @@ internal sealed class VendaService(
         await vendaRepository.AdicionarAsync(venda, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Result.Ok(ParaDto(venda));
+        var nomesProdutos = produtosPorId.ToDictionary(p => p.Key, p => p.Value.Nome);
+        return Result.Ok(ParaDto(venda, nomesProdutos));
     }
 
     public async Task<Result<VendaDto>> ObterPorIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -80,15 +81,24 @@ internal sealed class VendaService(
         if (venda is null)
             return Result.Falha<VendaDto>(PdvErrors.Venda.NaoEncontrada);
 
-        return Result.Ok(ParaDto(venda));
+        var produtoIds = venda.Itens.Select(i => i.ProdutoId).Distinct();
+        var produtos = await produtoRepository.ObterPorIdsAsync(produtoIds, cancellationToken);
+        var nomesProdutos = produtos.ToDictionary(p => p.Id, p => p.Nome);
+
+        return Result.Ok(ParaDto(venda, nomesProdutos));
     }
 
-    private static VendaDto ParaDto(Venda venda) => new(
+    private static VendaDto ParaDto(Venda venda, Dictionary<Guid, string> nomesProdutos) => new(
         venda.Id,
         venda.CriadoPor,
         venda.Total,
         venda.ValorPago,
         venda.Troco,
         venda.DataHora,
-        venda.Itens.Select(i => new ItemVendaDto(i.ProdutoId, i.Quantidade, i.PrecoUnitario, i.Subtotal)).ToList());
+        venda.Itens.Select(i => new ItemVendaDto(
+            i.ProdutoId,
+            nomesProdutos.GetValueOrDefault(i.ProdutoId, string.Empty),
+            i.Quantidade,
+            i.PrecoUnitario,
+            i.Subtotal)).ToList());
 }
