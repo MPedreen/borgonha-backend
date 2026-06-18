@@ -63,14 +63,37 @@ internal sealed class ProdutoService(
     public async Task<Result<IReadOnlyList<ProdutoDto>>> ObterAtivosAsync(CancellationToken cancellationToken = default)
     {
         var produtos = await produtoRepository.ObterAtivosAsync(cancellationToken);
-        return Result.Ok<IReadOnlyList<ProdutoDto>>(produtos.Select(ParaDto).ToList());
+
+        var ingredienteIds = produtos
+            .SelectMany(p => p.Receita.Select(r => r.IngredienteId))
+            .Distinct()
+            .ToList();
+
+        var ingredientes = ingredienteIds.Count > 0
+            ? await ingredienteRepository.ObterPorIdsAsync(ingredienteIds, cancellationToken)
+            : [];
+
+        var estoquePorIngrediente = ingredientes.ToDictionary(i => i.Id);
+
+        return Result.Ok<IReadOnlyList<ProdutoDto>>(
+            produtos.Select(p => ParaDto(p, estoquePorIngrediente)).ToList());
     }
 
-    private static ProdutoDto ParaDto(Produto produto) => new(
-        produto.Id,
-        produto.Nome,
-        produto.PrecoVenda,
-        produto.Ativo,
-        produto.CriadoEm,
-        produto.Receita.Select(r => new ItemReceitaDto(r.IngredienteId, r.Quantidade)).ToList());
+    private static ProdutoDto ParaDto(Produto produto, Dictionary<Guid, Ingrediente>? estoque = null)
+    {
+        var disponivel = estoque is not null
+            && produto.PossuiReceita
+            && produto.Receita.All(r =>
+                estoque.TryGetValue(r.IngredienteId, out var ing)
+                && ing.TemEstoqueSuficiente(r.Quantidade));
+
+        return new(
+            produto.Id,
+            produto.Nome,
+            produto.PrecoVenda,
+            produto.Ativo,
+            disponivel,
+            produto.CriadoEm,
+            produto.Receita.Select(r => new ItemReceitaDto(r.IngredienteId, r.Quantidade)).ToList());
+    }
 }

@@ -5,6 +5,7 @@ public sealed record ProdutoDto(
     string Nome,
     decimal PrecoVenda,
     bool Ativo,
+    bool Disponivel,
     DateTime CriadoEm,
     IReadOnlyCollection<ItemReceitaDto> Receita);
 

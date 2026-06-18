@@ -12,9 +12,18 @@ internal sealed class ProdutoRepository(BorgonhaDbContext context) : IProdutoRep
             .Include(p => p.Receita)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
 
+    public async Task<IReadOnlyList<Produto>> ObterPorIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        var lista = ids.ToList();
+        return await context.Produtos
+            .Where(p => lista.Contains(p.Id))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IReadOnlyList<Produto>> ObterAtivosAsync(CancellationToken cancellationToken = default)
         => await context.Produtos
             .Where(p => p.Ativo)
+            .Include(p => p.Receita)
             .ToListAsync(cancellationToken);
 
     public async Task AdicionarAsync(Produto produto, CancellationToken cancellationToken = default)
