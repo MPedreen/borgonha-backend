@@ -3,7 +3,7 @@ using Borgonha.Aplicacao.Catalogo;
 namespace Borgonha.Aplicacao.Administracao;
 
 /// <summary>
-/// Troca nome, descrição, frase, gramatura e variações de um produto.
+/// Troca nome, descrição, frase, gramatura, preço e variações de um produto.
 /// </summary>
 public sealed class AtualizarProduto(ICatalogoRepositorio repositorio)
 {
@@ -20,6 +20,7 @@ public sealed class AtualizarProduto(ICatalogoRepositorio repositorio)
 
         var nomeAnterior = produto.Nome;
         produto.Atualizar(dados.Nome, dados.Descricao, dados.Frase, dados.Peso, dados.Variacoes);
+        produto.DefinirPreco(dados.Preco);
 
         if (produto.Nome != nomeAnterior)
         {

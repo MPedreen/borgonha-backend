@@ -128,11 +128,12 @@ public sealed class AreaDoAdministradorTests(BorgonhaApiFactory fabrica) : IClas
 
         var edicao = await cliente.PutAsJsonAsync(
             new Uri($"/api/admin/produtos/{produto.Slug}", UriKind.Relative),
-            new DadosDoProdutoDto("Brigadeiro de Pistache", "Feito com pistache de verdade.", null, "25g", null),
+            new DadosDoProdutoDto("Brigadeiro de Pistache", "Feito com pistache de verdade.", null, "25g", 8.5m, null),
             Cancelamento);
         var editado = await edicao.Content.ReadFromJsonAsync<ProdutoAdminDto>(Cancelamento);
         Assert.Equal("Feito com pistache de verdade.", editado?.Descricao);
         Assert.Equal("25g", editado?.Peso);
+        Assert.Equal(8.5m, editado?.Preco);
 
         var noSite = await ObterProdutoNoSiteAsync(visitante, produto.Slug);
         Assert.Equal(HttpStatusCode.OK, noSite.StatusCode);
@@ -140,6 +141,44 @@ public sealed class AreaDoAdministradorTests(BorgonhaApiFactory fabrica) : IClas
         var exclusao = await cliente.DeleteAsync(new Uri($"/api/admin/produtos/{produto.Slug}", UriKind.Relative), Cancelamento);
         Assert.Equal(HttpStatusCode.NoContent, exclusao.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await ObterProdutoNoSiteAsync(visitante, produto.Slug)).StatusCode);
+    }
+
+    [Fact]
+    public async Task CadastraProdutoSoComNomeEPreco()
+    {
+        using var cliente = await CriarClienteComSessaoAsync();
+        using var visitante = fabrica.CriarClienteHttps();
+
+        var resposta = await cliente.PostAsJsonAsync(
+            new Uri("/api/admin/produtos", UriKind.Relative),
+            new NovoProdutoDto("doces", "Pavê de teste", null, null, null, 19m, null),
+            Cancelamento);
+
+        Assert.Equal(HttpStatusCode.Created, resposta.StatusCode);
+        var produto = await resposta.Content.ReadFromJsonAsync<ProdutoAdminDto>(Cancelamento);
+        Assert.Null(produto?.Descricao);
+        Assert.Equal(19m, produto?.Preco);
+
+        var noSite = await visitante.GetFromJsonAsync<ProdutoDto>(new Uri("/api/catalogo/pave-de-teste", UriKind.Relative), Cancelamento);
+        Assert.Equal(19m, noSite?.Preco);
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(12.999)]
+    [InlineData(10000)]
+    public async Task RecusaPrecoInvalido(double preco)
+    {
+        using var cliente = await CriarClienteComSessaoAsync();
+        var produto = await CriarProdutoAsync(cliente, $"Preço inválido {preco}");
+
+        var resposta = await cliente.PutAsJsonAsync(
+            new Uri($"/api/admin/produtos/{produto.Slug}", UriKind.Relative),
+            new DadosDoProdutoDto(produto.Nome, null, null, null, (decimal)preco, null),
+            Cancelamento);
+
+        Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
+        Assert.Contains("preço", (await resposta.Content.ReadFromJsonAsync<ProblemDetails>(Cancelamento))?.Title, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -183,7 +222,7 @@ public sealed class AreaDoAdministradorTests(BorgonhaApiFactory fabrica) : IClas
 
         var semNome = await cliente.PostAsJsonAsync(
             new Uri("/api/admin/produtos", UriKind.Relative),
-            new NovoProdutoDto("doces", " ", "Descrição.", null, null, null),
+            new NovoProdutoDto("doces", " ", "Descrição.", null, null, null, null),
             Cancelamento);
         var situacaoInvalida = await AlterarSituacaoAsync(cliente, "nutella", "sumido");
 
@@ -251,7 +290,7 @@ public sealed class AreaDoAdministradorTests(BorgonhaApiFactory fabrica) : IClas
     {
         var resposta = await cliente.PostAsJsonAsync(
             new Uri("/api/admin/produtos", UriKind.Relative),
-            new NovoProdutoDto("doces", nome, "Descrição do produto.", null, "100g", null),
+            new NovoProdutoDto("doces", nome, "Descrição do produto.", null, "100g", 12m, null),
             Cancelamento);
 
         Assert.Equal(HttpStatusCode.Created, resposta.StatusCode);

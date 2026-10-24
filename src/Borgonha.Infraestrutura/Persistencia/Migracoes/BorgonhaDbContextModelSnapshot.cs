@@ -57,7 +57,6 @@ namespace Borgonha.Infraestrutura.Persistencia.Migracoes
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Descricao")
-                        .IsRequired()
                         .HasMaxLength(400)
                         .HasColumnType("TEXT");
 

@@ -43,8 +43,8 @@ Exigem a sessão aberta (cookie) e o cabeçalho `X-Borgonha-Admin`. Respostas co
 | `GET /api/admin/sessao` | 204 com a sessão aberta; 401 sem ela |
 | `DELETE /api/admin/sessao` | Sai |
 | `GET /api/admin/cardapio` | Todos os produtos, inclusive os ocultos, com a situação de cada um |
-| `POST /api/admin/produtos` | Cadastra um produto (o slug sai do nome) |
-| `PUT /api/admin/produtos/{slug}` | Troca nome, descrição, frase, gramatura e variações |
+| `POST /api/admin/produtos` | Cadastra um produto (o slug sai do nome; só o nome é obrigatório) |
+| `PUT /api/admin/produtos/{slug}` | Troca nome, descrição, frase, gramatura, preço e variações |
 | `PUT /api/admin/produtos/{slug}/situacao` | `no-cardapio`, `esgotado` (aparece com o aviso) ou `oculto` (sai do site) |
 | `PUT /api/admin/produtos/{slug}/fotos/{inteiro\|partido}` | Envia uma foto (JPG, PNG, WebP ou HEIC, até 15 MB) |
 | `DELETE /api/admin/produtos/{slug}/fotos/{inteiro\|partido}` | Tira a foto |

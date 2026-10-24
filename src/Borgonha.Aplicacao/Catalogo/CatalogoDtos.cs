@@ -8,7 +8,7 @@ public sealed record ProdutoDto(
     string Slug,
     string Nome,
     string Categoria,
-    string Descricao,
+    string? Descricao,
     string? Frase,
     decimal? Preco,
     string? Peso,

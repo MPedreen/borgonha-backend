@@ -13,6 +13,7 @@ public sealed class Produto
     public const int TamanhoMaximoPeso = 20;
     public const int TamanhoMaximoSelo = 24;
     public const int TamanhoMaximoVariacao = 60;
+    public const decimal PrecoMaximo = 9_999.99m;
 
     private Produto()
     {
@@ -28,13 +29,19 @@ public sealed class Produto
 
     public string Nome { get; private set; } = string.Empty;
 
-    public string Descricao { get; private set; } = string.Empty;
+    /// <summary>
+    /// Opcional: um produto novo pode entrar no cardápio só com nome e preço.
+    /// </summary>
+    public string? Descricao { get; private set; }
 
     /// <summary>
     /// Frase curta e divertida usada no menu de sabores.
     /// </summary>
     public string? Frase { get; private set; }
 
+    /// <summary>
+    /// Preço em reais. Sem preço, o site mostra só o produto.
+    /// </summary>
     public decimal? Preco { get; private set; }
 
     /// <summary>
@@ -82,7 +89,7 @@ public sealed class Produto
     public static Produto Criar(
         Slug slug,
         string nome,
-        string descricao,
+        string? descricao,
         int ordem,
         string? frase = null,
         string? peso = null,
@@ -107,10 +114,10 @@ public sealed class Produto
     /// <summary>
     /// Troca os textos do produto (o slug continua o mesmo, para não quebrar links e âncoras).
     /// </summary>
-    public void Atualizar(string nome, string descricao, string? frase, string? peso, IEnumerable<string>? variacoes)
+    public void Atualizar(string nome, string? descricao, string? frase, string? peso, IEnumerable<string>? variacoes)
     {
         Nome = Garantir.TextoObrigatorio(nome, "Nome do produto", TamanhoMaximoNome);
-        Descricao = Garantir.TextoObrigatorio(descricao, "Descrição do produto", TamanhoMaximoDescricao);
+        Descricao = Garantir.TextoOpcional(descricao, "Descrição do produto", TamanhoMaximoDescricao);
         Frase = Garantir.TextoOpcional(frase, "Frase do produto", TamanhoMaximoFrase);
         Peso = Garantir.TextoOpcional(peso, "Peso do produto", TamanhoMaximoPeso);
         Variacoes = [.. (variacoes ?? [])
@@ -133,11 +140,17 @@ public sealed class Produto
         Disponivel = situacao != SituacaoProduto.Esgotado;
     }
 
+    /// <param name="preco">Preço em reais, ou <see langword="null"/> para não mostrar preço.</param>
     public void DefinirPreco(decimal? preco)
     {
-        if (preco is <= 0)
+        if (preco is <= 0 or > PrecoMaximo)
         {
-            throw new DominioException("O preço deve ser maior que zero.");
+            throw new DominioException("O preço deve ser maior que zero e de no máximo R$ 9.999,99.");
+        }
+
+        if (preco is { } valor && decimal.Round(valor, 2) != valor)
+        {
+            throw new DominioException("O preço deve ter no máximo dois dígitos de centavos (ex.: 12,50).");
         }
 
         Preco = preco;

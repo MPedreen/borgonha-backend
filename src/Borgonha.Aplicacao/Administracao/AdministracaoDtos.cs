@@ -14,30 +14,33 @@ public sealed record ProdutoAdminDto(
     string Slug,
     string Nome,
     string Categoria,
-    string Descricao,
+    string? Descricao,
     string? Frase,
     string? Peso,
+    decimal? Preco,
     IReadOnlyList<string> Variacoes,
     ImagensProdutoDto Imagens,
     string Situacao);
 
 /// <summary>
-/// Textos editáveis de um produto.
+/// Dados editáveis de um produto. Sem preço (<see langword="null"/>), o site mostra só o produto.
 /// </summary>
 public sealed record DadosDoProdutoDto(
     string Nome,
-    string Descricao,
+    string? Descricao,
     string? Frase,
     string? Peso,
+    decimal? Preco,
     IReadOnlyList<string>? Variacoes);
 
 /// <param name="Categoria">Slug da categoria: "cookies", "doces" ou "salgados".</param>
 public sealed record NovoProdutoDto(
     string Categoria,
     string Nome,
-    string Descricao,
+    string? Descricao,
     string? Frase,
     string? Peso,
+    decimal? Preco,
     IReadOnlyList<string>? Variacoes);
 
 public sealed record SituacaoDoProdutoDto(string Situacao);

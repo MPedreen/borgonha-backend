@@ -6,6 +6,7 @@ namespace Borgonha.Aplicacao.Administracao;
 
 /// <summary>
 /// Cadastra um produto novo no fim da categoria, já no cardápio. O slug sai do nome.
+/// Só o nome é obrigatório: descrição, gramatura e preço podem vir depois.
 /// </summary>
 public sealed class CriarProduto(ICatalogoRepositorio repositorio)
 {
@@ -24,6 +25,7 @@ public sealed class CriarProduto(ICatalogoRepositorio repositorio)
 
         var slug = await GerarSlugLivreAsync(dados.Nome, cancellationToken).ConfigureAwait(false);
         var produto = Produto.Criar(slug, dados.Nome, dados.Descricao, categoria.ProximaOrdem(), dados.Frase, dados.Peso, dados.Variacoes);
+        produto.DefinirPreco(dados.Preco);
         categoria.AdicionarProduto(produto);
 
         await repositorio.SalvarAsync(cancellationToken).ConfigureAwait(false);

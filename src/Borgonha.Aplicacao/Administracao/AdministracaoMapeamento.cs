@@ -20,6 +20,7 @@ internal static class AdministracaoMapeamento
             produto.Descricao,
             produto.Frase,
             produto.Peso,
+            produto.Preco,
             produto.Variacoes,
             produto.ImagensParaDto(),
             SituacoesDoProduto.ParaTexto(produto.Situacao));

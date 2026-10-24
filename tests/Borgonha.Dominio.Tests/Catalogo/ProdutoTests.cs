@@ -61,6 +61,37 @@ public sealed class ProdutoTests
     }
 
     [Fact]
+    public void TiraOPreco()
+    {
+        var produto = CriarProduto();
+        produto.DefinirPreco(15m);
+
+        produto.DefinirPreco(null);
+
+        Assert.Null(produto.Preco);
+    }
+
+    [Theory]
+    [InlineData("12.999")]
+    [InlineData("10000")]
+    public void RecusaPrecoComMaisDeDoisCentavosOuAlemDoLimite(string preco)
+    {
+        var produto = CriarProduto();
+
+        Assert.Throws<DominioException>(() => produto.DefinirPreco(decimal.Parse(preco, System.Globalization.CultureInfo.InvariantCulture)));
+    }
+
+    [Fact]
+    public void AceitaProdutoSemDescricao()
+    {
+        var produto = Produto.Criar(Slug.Criar("matilda"), "Matilda", null, 0);
+
+        produto.Atualizar("Matilda", "   ", null, null, null);
+
+        Assert.Null(produto.Descricao);
+    }
+
+    [Fact]
     public void GuardaOPesoSemEspacosNasPontas()
     {
         var produto = Produto.Criar(Slug.Criar("tradicional"), "Tradicional", "Massa de manteiga tostada.", 0, peso: " 100g ");
@@ -133,7 +164,7 @@ public sealed class ProdutoTests
     [Fact]
     public void ValidaOsTextosAoAtualizar()
     {
-        Assert.Throws<DominioException>(() => CriarProduto().Atualizar("Red Velvet", " ", null, null, null));
+        Assert.Throws<DominioException>(() => CriarProduto().Atualizar(" ", "Recheio de Galak.", null, null, null));
     }
 
     [Fact]
