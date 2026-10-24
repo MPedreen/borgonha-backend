@@ -1,9 +1,12 @@
+using Borgonha.Aplicacao.Administracao;
+using Borgonha.Dominio.Comum;
 using Microsoft.AspNetCore.Diagnostics;
 
 namespace Borgonha.Api.Configuracao;
 
 /// <summary>
-/// Registra erros não tratados e responde com um ProblemDetails (RFC 9457), sem expor detalhes internos.
+/// Responde erros com um ProblemDetails (RFC 9457). Regras de negócio violadas viram 400 com a
+/// mensagem para quem está usando; erros inesperados são registrados e não expõem detalhes internos.
 /// </summary>
 internal sealed partial class TratadorDeExcecoes(
     IProblemDetailsService problemDetails,
@@ -11,9 +14,21 @@ internal sealed partial class TratadorDeExcecoes(
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        RegistrarErro(logger, exception, httpContext.Request.Path);
+        var (status, titulo) = exception switch
+        {
+            DominioException or ImagemInvalidaException => (StatusCodes.Status400BadRequest, exception.Message),
+            BadHttpRequestException { StatusCode: StatusCodes.Status413PayloadTooLarge } =>
+                (StatusCodes.Status413PayloadTooLarge, "O arquivo enviado é grande demais."),
+            BadHttpRequestException requisicaoInvalida => (requisicaoInvalida.StatusCode, "Requisição inválida."),
+            _ => (StatusCodes.Status500InternalServerError, "Ocorreu um erro inesperado. Tente novamente em instantes."),
+        };
 
-        httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        if (status == StatusCodes.Status500InternalServerError)
+        {
+            RegistrarErro(logger, exception, httpContext.Request.Path);
+        }
+
+        httpContext.Response.StatusCode = status;
 
         return await problemDetails.TryWriteAsync(new ProblemDetailsContext
         {
@@ -21,8 +36,8 @@ internal sealed partial class TratadorDeExcecoes(
             Exception = exception,
             ProblemDetails =
             {
-                Status = StatusCodes.Status500InternalServerError,
-                Title = "Ocorreu um erro inesperado. Tente novamente em instantes.",
+                Status = status,
+                Title = titulo,
             },
         }).ConfigureAwait(false);
     }

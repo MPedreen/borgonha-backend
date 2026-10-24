@@ -16,7 +16,8 @@ internal static class EndpointsDaApi
         app.MapGroup("/api/admin")
             .WithTags("Área do administrador")
             .AddEndpointFilter(ExigirCabecalhoDoAdministrador)
-            .MapearSessaoAdmin();
+            .MapearSessaoAdmin()
+            .MapearCardapioAdmin();
 
         app.MapHealthChecks("/health");
 

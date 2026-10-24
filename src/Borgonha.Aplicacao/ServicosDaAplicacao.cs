@@ -1,3 +1,4 @@
+using Borgonha.Aplicacao.Administracao;
 using Borgonha.Aplicacao.Catalogo;
 using Borgonha.Aplicacao.Duvidas;
 using Borgonha.Aplicacao.Lojas;
@@ -13,6 +14,14 @@ public static class ServicosDaAplicacao
         services.AddScoped<ObterProduto>();
         services.AddScoped<ObterLoja>();
         services.AddScoped<ListarDuvidas>();
+
+        services.AddScoped<ListarCardapioAdmin>();
+        services.AddScoped<CriarProduto>();
+        services.AddScoped<AtualizarProduto>();
+        services.AddScoped<AlterarSituacaoDoProduto>();
+        services.AddScoped<ExcluirProduto>();
+        services.AddScoped<TrocarFotoDoProduto>();
+        services.AddScoped<RemoverFotoDoProduto>();
 
         return services;
     }
