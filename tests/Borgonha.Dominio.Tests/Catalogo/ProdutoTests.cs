@@ -47,18 +47,32 @@ public sealed class ProdutoTests
     {
         var produto = CriarProduto();
 
-        Assert.Throws<DominioException>(() => produto.DefinirPreco(preco, "100 g"));
+        Assert.Throws<DominioException>(() => produto.DefinirPreco(preco));
     }
 
     [Fact]
-    public void DefinePrecoEPeso()
+    public void DefinePreco()
     {
         var produto = CriarProduto();
 
-        produto.DefinirPreco(12.90m, "100 g");
+        produto.DefinirPreco(12.90m);
 
         Assert.Equal(12.90m, produto.Preco);
-        Assert.Equal("100 g", produto.Peso);
+    }
+
+    [Fact]
+    public void GuardaOPesoSemEspacosNasPontas()
+    {
+        var produto = Produto.Criar(Slug.Criar("tradicional"), "Tradicional", "Massa de manteiga tostada.", 0, peso: " 100g ");
+
+        Assert.Equal("100g", produto.Peso);
+    }
+
+    [Fact]
+    public void RecusaPesoMaiorQueOLimite()
+    {
+        Assert.Throws<DominioException>(() =>
+            Produto.Criar(Slug.Criar("tradicional"), "Tradicional", "Massa de manteiga tostada.", 0, peso: new string('1', Produto.TamanhoMaximoPeso + 1)));
     }
 
     [Fact]

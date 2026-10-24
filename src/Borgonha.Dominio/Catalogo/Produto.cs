@@ -72,6 +72,7 @@ public sealed class Produto
         string descricao,
         int ordem,
         string? frase = null,
+        string? peso = null,
         IEnumerable<string>? variacoes = null,
         Imagem? imagemInteiro = null,
         Imagem? imagemPartido = null)
@@ -84,6 +85,7 @@ public sealed class Produto
             Nome = Garantir.TextoObrigatorio(nome, "Nome do produto", TamanhoMaximoNome),
             Descricao = Garantir.TextoObrigatorio(descricao, "Descrição do produto", TamanhoMaximoDescricao),
             Frase = Garantir.TextoOpcional(frase, "Frase do produto", TamanhoMaximoFrase),
+            Peso = Garantir.TextoOpcional(peso, "Peso do produto", TamanhoMaximoPeso),
             Variacoes = [.. (variacoes ?? []).Select(variacao => Garantir.TextoObrigatorio(variacao, "Variação do produto", TamanhoMaximoVariacao))],
             ImagemInteiro = imagemInteiro,
             ImagemPartido = imagemPartido,
@@ -91,7 +93,7 @@ public sealed class Produto
         };
     }
 
-    public void DefinirPreco(decimal? preco, string? peso)
+    public void DefinirPreco(decimal? preco)
     {
         if (preco is <= 0)
         {
@@ -99,7 +101,6 @@ public sealed class Produto
         }
 
         Preco = preco;
-        Peso = Garantir.TextoOpcional(peso, "Peso do produto", TamanhoMaximoPeso);
     }
 
     public void DefinirSelo(string? selo) =>
