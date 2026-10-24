@@ -6,6 +6,7 @@
     <Project Path="src/Borgonha.Infraestrutura/Borgonha.Infraestrutura.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Borgonha.Api.Tests/Borgonha.Api.Tests.csproj" />
     <Project Path="tests/Borgonha.Dominio.Tests/Borgonha.Dominio.Tests.csproj" />
   </Folder>
 </Solution>
