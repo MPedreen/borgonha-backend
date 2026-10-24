@@ -1,0 +1,18 @@
+# Build e testes
+bin/
+obj/
+TestResults/
+
+# IDEs
+.vs/
+.idea/
+*.user
+
+# Bancos SQLite locais (a API cria o dela em src/Borgonha.Api/dados/)
+*.db
+*.db-shm
+*.db-wal
+
+# Sistema
+.DS_Store
+Thumbs.db

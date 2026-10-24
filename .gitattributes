@@ -1,0 +1,2 @@
+# LF em todos os arquivos de texto, como pede o .editorconfig
+* text=auto eol=lf
