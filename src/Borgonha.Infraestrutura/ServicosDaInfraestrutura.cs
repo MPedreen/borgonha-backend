@@ -1,6 +1,8 @@
+using Borgonha.Aplicacao.Administracao;
 using Borgonha.Aplicacao.Catalogo;
 using Borgonha.Aplicacao.Duvidas;
 using Borgonha.Aplicacao.Lojas;
+using Borgonha.Infraestrutura.Imagens;
 using Borgonha.Infraestrutura.Persistencia;
 using Borgonha.Infraestrutura.Repositorios;
 using Microsoft.Data.Sqlite;
@@ -11,9 +13,11 @@ namespace Borgonha.Infraestrutura;
 
 public static class ServicosDaInfraestrutura
 {
-    public static IServiceCollection AdicionarInfraestrutura(this IServiceCollection services, string conexaoBanco)
+    /// <param name="pastaDasImagens">Pasta absoluta onde ficam as fotos enviadas pela área do administrador.</param>
+    public static IServiceCollection AdicionarInfraestrutura(this IServiceCollection services, string conexaoBanco, string pastaDasImagens)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(conexaoBanco);
+        ArgumentException.ThrowIfNullOrWhiteSpace(pastaDasImagens);
 
         services.AddDbContext<BorgonhaDbContext>(opcoes => opcoes
             .UseSqlite(conexaoBanco)
@@ -23,6 +27,9 @@ public static class ServicosDaInfraestrutura
         services.AddScoped<ICatalogoRepositorio, CatalogoRepositorio>();
         services.AddScoped<ILojaRepositorio, LojaRepositorio>();
         services.AddScoped<IDuvidaRepositorio, DuvidaRepositorio>();
+
+        services.AddSingleton(new OpcoesDasImagens(pastaDasImagens));
+        services.AddSingleton<IArmazenamentoDeImagens, ArmazenamentoDeImagensEmDisco>();
 
         services.AddHealthChecks().AddDbContextCheck<BorgonhaDbContext>("banco-de-dados");
 

@@ -8,7 +8,9 @@ TestResults/
 .idea/
 *.user
 
-# Bancos SQLite locais (a API cria o dela em src/Borgonha.Api/dados/)
+# Dados locais da API: banco SQLite, fotos enviadas pelo administrador e chaves que protegem
+# o cookie da sessão (as chaves NUNCA podem ir para o repositório)
+src/Borgonha.Api/dados/
 *.db
 *.db-shm
 *.db-wal

@@ -4,7 +4,7 @@ namespace Borgonha.Api.Configuracao;
 
 internal static class PipelineDaApi
 {
-    public static WebApplication UsarApi(this WebApplication app)
+    public static WebApplication UsarApi(this WebApplication app, string pastaDasImagens)
     {
         app.UseExceptionHandler();
         app.UseStatusCodePages();
@@ -21,6 +21,7 @@ internal static class PipelineDaApi
         }
 
         app.UseResponseCompression();
+        app.UsarImagensEnviadas(pastaDasImagens);
         app.UseCors();
         app.UseOutputCache();
 
