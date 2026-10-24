@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Borgonha.Api/Borgonha.Api.csproj" />
     <Project Path="src/Borgonha.Aplicacao/Borgonha.Aplicacao.csproj" />
     <Project Path="src/Borgonha.Dominio/Borgonha.Dominio.csproj" />
     <Project Path="src/Borgonha.Infraestrutura/Borgonha.Infraestrutura.csproj" />
