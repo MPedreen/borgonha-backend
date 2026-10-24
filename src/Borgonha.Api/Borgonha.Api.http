@@ -1,0 +1,24 @@
+@Api = http://localhost:5170
+
+### Cardápio completo (cookies, doces e salgados)
+GET {{Api}}/api/catalogo
+Accept: application/json
+
+### Um produto pelo slug
+GET {{Api}}/api/catalogo/red-velvet
+Accept: application/json
+
+### Produto inexistente (404 em ProblemDetails)
+GET {{Api}}/api/catalogo/nao-existe
+Accept: application/json
+
+### Loja: endereço, horários e canais de pedido
+GET {{Api}}/api/loja
+Accept: application/json
+
+### Perguntas frequentes
+GET {{Api}}/api/duvidas
+Accept: application/json
+
+### Saúde da API e do banco
+GET {{Api}}/health
