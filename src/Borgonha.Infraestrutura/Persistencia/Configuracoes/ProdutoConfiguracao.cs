@@ -1,0 +1,43 @@
+using Borgonha.Dominio.Catalogo;
+using Borgonha.Dominio.Comum;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Borgonha.Infraestrutura.Persistencia.Configuracoes;
+
+internal sealed class ProdutoConfiguracao : IEntityTypeConfiguration<Produto>
+{
+    public void Configure(EntityTypeBuilder<Produto> builder)
+    {
+        builder.ToTable("Produtos");
+        builder.HasKey(produto => produto.Id);
+
+        builder.Property(produto => produto.Slug).HasConversion<ConversorSlug>().HasMaxLength(Slug.TamanhoMaximo);
+        builder.HasIndex(produto => produto.Slug).IsUnique();
+
+        builder.Property(produto => produto.Nome).HasMaxLength(Produto.TamanhoMaximoNome);
+        builder.Property(produto => produto.Descricao).HasMaxLength(Produto.TamanhoMaximoDescricao);
+        builder.Property(produto => produto.Frase).HasMaxLength(Produto.TamanhoMaximoFrase);
+        builder.Property(produto => produto.Preco).HasPrecision(10, 2);
+        builder.Property(produto => produto.Peso).HasMaxLength(Produto.TamanhoMaximoPeso);
+        builder.Property(produto => produto.Selo).HasMaxLength(Produto.TamanhoMaximoSelo);
+        builder.PrimitiveCollection(produto => produto.Variacoes);
+
+        builder.OwnsOne(produto => produto.ImagemInteiro, imagem => ConfigurarImagem(imagem, "ImagemInteiro"));
+        builder.OwnsOne(produto => produto.ImagemPartido, imagem => ConfigurarImagem(imagem, "ImagemPartido"));
+
+        builder.HasOne(produto => produto.Categoria)
+            .WithMany(categoria => categoria.Produtos)
+            .HasForeignKey(produto => produto.CategoriaId);
+    }
+
+    private static void ConfigurarImagem(OwnedNavigationBuilder<Produto, Imagem> imagem, string prefixoColuna)
+    {
+        imagem.Property(foto => foto.Caminho)
+            .HasColumnName($"{prefixoColuna}Caminho")
+            .HasMaxLength(Imagem.TamanhoMaximoCaminho);
+        imagem.Property(foto => foto.TextoAlternativo)
+            .HasColumnName($"{prefixoColuna}TextoAlternativo")
+            .HasMaxLength(Imagem.TamanhoMaximoTextoAlternativo);
+    }
+}

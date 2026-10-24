@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/Borgonha.Aplicacao/Borgonha.Aplicacao.csproj" />
     <Project Path="src/Borgonha.Dominio/Borgonha.Dominio.csproj" />
+    <Project Path="src/Borgonha.Infraestrutura/Borgonha.Infraestrutura.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Borgonha.Dominio.Tests/Borgonha.Dominio.Tests.csproj" />
