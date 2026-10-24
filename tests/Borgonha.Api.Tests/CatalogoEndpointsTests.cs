@@ -9,7 +9,7 @@ public sealed class CatalogoEndpointsTests(BorgonhaApiFactory fabrica) : IClassF
     private static readonly string[] CategoriasEsperadas = ["cookies", "doces", "salgados"];
 
     private static readonly string[] CookiesEsperados =
-        ["tradicional", "nutella", "bueno", "triplo-chocolate", "red-velvet", "pistache", "bala-baiana", "mms"];
+        ["tradicional", "nutella", "bueno", "triplo-chocolate", "red-velvet", "mms"];
 
     private static readonly string[] SaboresDoBoloDePote =
         ["Chocolate & Maracujá", "Frutas Vermelhas & Ninho", "Nutella & Ninho"];
@@ -25,13 +25,14 @@ public sealed class CatalogoEndpointsTests(BorgonhaApiFactory fabrica) : IClassF
     }
 
     [Fact]
-    public async Task ListaOsOitoSaboresDeCookieNaOrdemDoCardapio()
+    public async Task ListaOsSeisSaboresDeCookieNaOrdemDoCardapio()
     {
         var catalogo = await ObterCatalogoAsync();
 
         var cookies = catalogo.Categorias.Single(categoria => categoria.Slug == "cookies");
         Assert.Equal(CookiesEsperados, cookies.Produtos.Select(produto => produto.Slug));
         Assert.All(cookies.Produtos, produto => Assert.NotNull(produto.Frase));
+        Assert.All(cookies.Produtos, produto => Assert.NotNull(produto.Peso));
     }
 
     [Fact]

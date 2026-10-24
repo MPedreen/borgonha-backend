@@ -55,51 +55,44 @@ internal static class DadosIniciais
     private static IEnumerable<Categoria> CriarCategorias()
     {
         var cookies = Categoria.Criar(Slug.Criar("cookies"), "Cookies", 0);
-        AdicionarCookie(cookies, "tradicional", "Tradicional", 0,
-            "Massa com manteiga tostada, gotas de chocolate meio amargo e flor de sal.",
+        AdicionarCookie(cookies, "tradicional", "Tradicional", 0, "100g",
+            "Massa de manteiga tostada e gotas de chocolate meio amargo, finalizado com flor de sal para realçar os sabores e trazer o equilíbrio perfeito entre doce e salgado.",
             "Manteiga tostada e flor de sal: o clássico que nunca erra.",
             "Cookie tradicional visto de cima, com pedaços de chocolate e flor de sal");
-        AdicionarCookie(cookies, "nutella", "Nutella", 1,
-            "Massa de baunilha, gotas de chocolate meio amargo e recheio de Nutella.",
+        AdicionarCookie(cookies, "nutella", "Nutella", 1, "130g",
+            "Massa tradicional com gotas de chocolate meio amargo e um recheio generoso de Nutella. Porque os clássicos são clássicos...",
             "Recheado de Nutella. Precisa dizer mais?",
             "Cookie de Nutella visto de cima, com fios de chocolate",
             "Cookie de Nutella partido ao meio, com a Nutella escorrendo");
-        AdicionarCookie(cookies, "bueno", "Bueno", 2,
-            "Massa de baunilha, gotas de chocolate branco e meio amargo e recheio Bueno.",
-            "O sabor do Bueno, agora em versão cookie.",
-            "Cookie Bueno visto de cima, com um pedaço de Kinder Bueno",
-            "Cookie Bueno partido ao meio, com recheio cremoso e um pedaço de Kinder Bueno por cima");
-        AdicionarCookie(cookies, "triplo-chocolate", "Triplo Chocolate", 3,
-            "Massa de cacau black, gotas de chocolate branco, blend e meio amargo e recheio Galak.",
+        AdicionarCookie(cookies, "bueno", "Kinder Bueno", 2, "130g",
+            "Massa tradicional com gotas de chocolate branco e chocolate ao leite, recheada com o nosso maravilhoso creme de Kinder Bueno.",
+            "O sabor do Kinder Bueno, agora em versão cookie.",
+            "Cookie de Kinder Bueno visto de cima, com um pedaço de Kinder Bueno",
+            "Cookie de Kinder Bueno partido ao meio, com recheio cremoso e um pedaço de Kinder Bueno por cima");
+        AdicionarCookie(cookies, "triplo-chocolate", "Triplo Chocolate", 3, "130g",
+            "Nosso Triplo Chocolate é para os verdadeiros amantes de chocolate! Uma irresistível massa de cacau black com três tipos de chocolate: ao leite, branco e meio amargo, finalizada com um delicioso recheio cremoso de Galak.",
             "Para quem acha que chocolate nunca é demais.",
             "Cookie triplo chocolate de massa escura visto de cima, com pedaços de chocolate branco",
-            "Cookie triplo chocolate partido ao meio, com recheio branco cremoso");
-        AdicionarCookie(cookies, "red-velvet", "Red Velvet", 4,
-            "Massa red velvet, gotas de chocolate branco e recheio de brigadeiro de Ninho com cream cheese.",
+            "Cookie triplo chocolate partido ao meio, com recheio cremoso de Galak");
+        AdicionarCookie(cookies, "red-velvet", "Red Velvet", 4, "130g",
+            "Massa com chocolate branco e recheio de Galak com cream cheese. Uma combinação equilibrada entre o sabor intenso do chocolate branco e o sabor do cream cheese.",
             "Vermelho por fora, cremoso por dentro.",
             "Cookie red velvet visto de cima, com gotas de chocolate branco",
-            "Cookie red velvet partido ao meio, mostrando o recheio de brigadeiro de Ninho com cream cheese");
-        AdicionarCookie(cookies, "pistache", "Pistache", 5,
-            "Massa de baunilha, gotas de chocolate branco e recheio de creme de pistache.",
-            "Verdinho, cremoso e difícil de dividir.",
-            "Cookie de pistache visto de cima, com fios de creme de pistache e pistache picado");
-        AdicionarCookie(cookies, "bala-baiana", "Bala Baiana", 6,
-            "Massa com manteiga tostada, gotas de chocolate branco, coco, bites de caramelo e amêndoas laminadas.",
-            "Coco, caramelo e amêndoas: a bala baiana virou cookie.",
-            "Cookie bala baiana visto de cima, com coco e amêndoas laminadas");
-        AdicionarCookie(cookies, "mms", "M&M", 7,
-            "Massa de baunilha, M&M's e chocolate meio amargo, recheado com chocolate meio amargo.",
+            "Cookie red velvet partido ao meio, mostrando o recheio de Galak com cream cheese");
+        AdicionarCookie(cookies, "mms", "M&M", 5, "115g",
+            "Massa tradicional com gotas de chocolate ao leite e M&M’s, recheada com chocolate meio amargo para uma combinação irresistível de sabores e texturas.",
             "Colorido por fora, chocolate derretido por dentro.",
-            "Cookie de M&M's visto de cima, com confeitos coloridos",
-            "Cookie de M&M's partido ao meio, com recheio de chocolate");
+            "Cookie de M&M’s visto de cima, com confeitos coloridos",
+            "Cookie de M&M’s partido ao meio, com recheio de chocolate");
 
         var doces = Categoria.Criar(Slug.Criar("doces"), "Doces", 1);
         doces.AdicionarProduto(Produto.Criar(
             Slug.Criar("brookie"),
             "Brookie",
-            "Brownie e cookie na mesma marmitinha, finalizados com Nutella.",
+            "Nosso famoso Brookie! A combinação perfeita entre nosso cookie artesanal e brownie artesanal, com uma generosa camada de Nutella. Cremoso por dentro e muito chocolatudo!",
             0,
             frase: "Brownie + cookie: o melhor dos dois mundos.",
+            peso: "170g",
             imagemInteiro: new Imagem("doces/brookie", "Brookie na marmitinha, com camada de cookie e Nutella por cima")));
         doces.AdicionarProduto(Produto.Criar(
             Slug.Criar("brownie-doce-de-leite"),
@@ -136,12 +129,13 @@ internal static class DadosIniciais
         string slug,
         string nome,
         int ordem,
+        string peso,
         string descricao,
         string frase,
         string textoAlternativoInteiro,
         string? textoAlternativoPartido = null)
     {
-        // Fotos dos cookies partidos de Tradicional, Pistache e Bala Baiana: pendentes.
+        // Foto do cookie Tradicional partido: pendente.
         var imagemPartido = textoAlternativoPartido is null
             ? null
             : new Imagem($"cookies/{slug}-partido", textoAlternativoPartido);
@@ -152,6 +146,7 @@ internal static class DadosIniciais
             descricao,
             ordem,
             frase,
+            peso,
             imagemInteiro: new Imagem($"cookies/{slug}-inteiro", textoAlternativoInteiro),
             imagemPartido: imagemPartido));
     }
