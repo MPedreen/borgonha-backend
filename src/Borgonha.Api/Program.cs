@@ -1,18 +1,26 @@
+using Borgonha.Api.Administracao;
 using Borgonha.Api.Configuracao;
 using Borgonha.Api.Endpoints;
 using Borgonha.Aplicacao;
 using Borgonha.Infraestrutura;
+
+// dotnet run --project src/Borgonha.Api -- gerar-hash-senha
+if (args is [GeradorDeHashDeSenha.Comando])
+{
+    return GeradorDeHashDeSenha.Executar();
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
 var conexaoBanco = builder.Configuration.GetConnectionString("Borgonha")
     ?? throw new InvalidOperationException("Configure a connection string 'Borgonha'.");
 var pastaDasImagens = PastaDaConfiguracao("Armazenamento:PastaDasImagens");
+var pastaDasChaves = PastaDaConfiguracao("Armazenamento:PastaDasChaves");
 
 builder.Services
     .AdicionarAplicacao()
     .AdicionarInfraestrutura(conexaoBanco, pastaDasImagens)
-    .AdicionarApi(builder.Configuration);
+    .AdicionarApi(builder.Configuration, builder.Environment, pastaDasChaves);
 
 var app = builder.Build();
 
@@ -25,6 +33,7 @@ app.UsarApi(pastaDasImagens);
 app.MapearEndpoints();
 
 await app.RunAsync();
+return 0;
 
 // Pastas relativas são resolvidas a partir da pasta do projeto da API.
 string PastaDaConfiguracao(string chave) =>

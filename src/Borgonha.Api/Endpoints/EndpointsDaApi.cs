@@ -12,8 +12,31 @@ internal static class EndpointsDaApi
         api.MapearLoja();
         api.MapearDuvidas();
 
+        // Fora do grupo /api: nada da área do administrador passa pelo cache.
+        app.MapGroup("/api/admin")
+            .WithTags("Área do administrador")
+            .AddEndpointFilter(ExigirCabecalhoDoAdministrador)
+            .MapearSessaoAdmin();
+
         app.MapHealthChecks("/health");
 
         return app;
+    }
+
+    /// <summary>
+    /// Exige o cabeçalho da área do administrador (proteção contra CSRF) e impede que respostas
+    /// com dados da área fiquem guardadas no navegador ou em proxies.
+    /// </summary>
+    private static async ValueTask<object?> ExigirCabecalhoDoAdministrador(EndpointFilterInvocationContext contexto, EndpointFilterDelegate proximo)
+    {
+        var http = contexto.HttpContext;
+        http.Response.Headers.CacheControl = "no-store";
+
+        if (!http.Request.Headers.ContainsKey(AutenticacaoDoAdministrador.Cabecalho))
+        {
+            return TypedResults.Problem(statusCode: StatusCodes.Status403Forbidden, title: "Requisição recusada.");
+        }
+
+        return await proximo(contexto).ConfigureAwait(false);
     }
 }

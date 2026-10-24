@@ -1,4 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <!-- Só o identificador da pasta de user-secrets: os segredos ficam fora do repositório. -->
+    <UserSecretsId>4489b995-e6a3-4776-958b-2fa5030b1746</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Borgonha.Api.Tests" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Borgonha.Aplicacao\Borgonha.Aplicacao.csproj" />

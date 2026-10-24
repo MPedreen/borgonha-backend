@@ -4,7 +4,11 @@ namespace Borgonha.Api.Configuracao;
 
 internal static class ServicosDaApi
 {
-    public static IServiceCollection AdicionarApi(this IServiceCollection services, IConfiguration configuracao)
+    public static IServiceCollection AdicionarApi(
+        this IServiceCollection services,
+        IConfiguration configuracao,
+        IHostEnvironment ambiente,
+        string pastaDasChaves)
     {
         services.AddProblemDetails();
         services.AddExceptionHandler<TratadorDeExcecoes>();
@@ -25,11 +29,15 @@ internal static class ServicosDaApi
             .Validate(opcoes => opcoes.OrigensSaoValidas(), "Cors:OrigensPermitidas deve conter só origens absolutas, como https://www.seudominio.com.br.")
             .ValidateOnStart();
 
+        // Com credenciais (o cookie da área do administrador), mas só para as origens configuradas.
         var cors = configuracao.GetSection(CorsOpcoes.Secao).Get<CorsOpcoes>() ?? new CorsOpcoes();
         services.AddCors(opcoes => opcoes.AddDefaultPolicy(politica => politica
             .WithOrigins([.. cors.OrigensPermitidas])
-            .WithMethods(HttpMethods.Get)
-            .AllowAnyHeader()));
+            .WithMethods(HttpMethods.Get, HttpMethods.Post, HttpMethods.Put, HttpMethods.Delete)
+            .AllowAnyHeader()
+            .AllowCredentials()));
+
+        services.AdicionarAutenticacaoDoAdministrador(configuracao, ambiente, pastaDasChaves);
 
         return services;
     }
