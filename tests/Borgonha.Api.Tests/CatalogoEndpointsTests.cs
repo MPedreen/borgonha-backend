@@ -11,8 +11,7 @@ public sealed class CatalogoEndpointsTests(BorgonhaApiFactory fabrica) : IClassF
     private static readonly string[] CookiesEsperados =
         ["tradicional", "nutella", "bueno", "triplo-chocolate", "red-velvet", "mms"];
 
-    private static readonly string[] SaboresDoBoloDePote =
-        ["Chocolate & Maracujá", "Frutas Vermelhas & Ninho", "Nutella & Ninho"];
+    private static readonly string[] ForaDoCardapioDeHoje = ["bolo-de-pote", "empadao-frango"];
 
     private readonly HttpClient _cliente = fabrica.CreateClient();
 
@@ -33,6 +32,36 @@ public sealed class CatalogoEndpointsTests(BorgonhaApiFactory fabrica) : IClassF
         Assert.Equal(CookiesEsperados, cookies.Produtos.Select(produto => produto.Slug));
         Assert.All(cookies.Produtos, produto => Assert.NotNull(produto.Frase));
         Assert.All(cookies.Produtos, produto => Assert.NotNull(produto.Peso));
+        Assert.All(cookies.Produtos, produto => Assert.NotNull(produto.Preco));
+    }
+
+    [Fact]
+    public async Task MostraOsPrecosDoCardapio()
+    {
+        var catalogo = await ObterCatalogoAsync();
+        var precos = catalogo.Categorias
+            .SelectMany(categoria => categoria.Produtos)
+            .ToDictionary(produto => produto.Slug, produto => produto.Preco);
+
+        Assert.Equal(10m, precos["tradicional"]);
+        Assert.Equal(12m, precos["mms"]);
+        Assert.Equal(15m, precos["brookie"]);
+        Assert.Equal(19m, precos["matilda"]);
+        Assert.Equal(10m, precos["bolinho-de-aipim"]);
+    }
+
+    [Fact]
+    public async Task ProdutosForaDoCardapioDeHojeNaoAparecem()
+    {
+        var catalogo = await ObterCatalogoAsync();
+        var slugs = catalogo.Categorias.SelectMany(categoria => categoria.Produtos).Select(produto => produto.Slug);
+
+        Assert.All(ForaDoCardapioDeHoje, slug => Assert.DoesNotContain(slug, slugs));
+        foreach (var slug in ForaDoCardapioDeHoje)
+        {
+            var resposta = await _cliente.GetAsync(new Uri($"/api/catalogo/{slug}", UriKind.Relative), TestContext.Current.CancellationToken);
+            Assert.Equal(HttpStatusCode.NotFound, resposta.StatusCode);
+        }
     }
 
     [Fact]
@@ -47,11 +76,12 @@ public sealed class CatalogoEndpointsTests(BorgonhaApiFactory fabrica) : IClassF
     [Fact]
     public async Task ObtemUmProdutoPeloSlug()
     {
-        var produto = await _cliente.GetFromJsonAsync<ProdutoDto>("/api/catalogo/bolo-de-pote", TestContext.Current.CancellationToken);
+        var produto = await _cliente.GetFromJsonAsync<ProdutoDto>("/api/catalogo/brookie", TestContext.Current.CancellationToken);
 
         Assert.NotNull(produto);
         Assert.Equal("doces", produto.Categoria);
-        Assert.Equal(SaboresDoBoloDePote, produto.Variacoes);
+        Assert.Equal("170g", produto.Peso);
+        Assert.Equal(15m, produto.Preco);
     }
 
     [Theory]

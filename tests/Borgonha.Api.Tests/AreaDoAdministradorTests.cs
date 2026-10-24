@@ -111,7 +111,7 @@ public sealed class AreaDoAdministradorTests(BorgonhaApiFactory fabrica) : IClas
         var cardapio = await cliente.GetFromJsonAsync<CardapioAdminDto>(new Uri("/api/admin/cardapio", UriKind.Relative), Cancelamento);
 
         var cookies = Assert.Single(cardapio!.Categorias, categoria => categoria.Slug == "cookies");
-        Assert.Contains(cookies.Produtos, produto => produto.Slug == "nutella" && produto.Peso == "130g");
+        Assert.Contains(cookies.Produtos, produto => produto.Slug == "nutella" && produto.Peso == "130g" && produto.Preco == 15m);
         Assert.All(cookies.Produtos, produto => Assert.Contains(produto.Situacao, SituacoesValidas));
     }
 
