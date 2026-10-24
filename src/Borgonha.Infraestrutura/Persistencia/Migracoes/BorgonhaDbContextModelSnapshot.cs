@@ -50,6 +50,9 @@ namespace Borgonha.Infraestrutura.Persistencia.Migracoes
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("CategoriaId")
                         .HasColumnType("INTEGER");
 

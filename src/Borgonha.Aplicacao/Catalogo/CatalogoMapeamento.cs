@@ -5,11 +5,17 @@ namespace Borgonha.Aplicacao.Catalogo;
 
 internal static class CatalogoMapeamento
 {
+    /// <summary>
+    /// Categoria como o site mostra: só os produtos do cardápio da semana (os ocultos ficam de fora).
+    /// </summary>
     public static CategoriaDto ParaDto(this Categoria categoria) =>
         new(
             categoria.Slug.Valor,
             categoria.Nome,
-            [.. categoria.Produtos.OrderBy(produto => produto.Ordem).Select(produto => produto.ParaDto(categoria.Slug))]);
+            [.. categoria.Produtos
+                .Where(produto => produto.Ativo)
+                .OrderBy(produto => produto.Ordem)
+                .Select(produto => produto.ParaDto(categoria.Slug))]);
 
     public static ProdutoDto ParaDto(this Produto produto, Slug categoria) =>
         new(
@@ -22,8 +28,11 @@ internal static class CatalogoMapeamento
             produto.Peso,
             produto.Selo,
             produto.Variacoes,
-            new ImagensProdutoDto(produto.ImagemInteiro?.ParaDto(), produto.ImagemPartido?.ParaDto()),
+            produto.ImagensParaDto(),
             produto.Disponivel);
+
+    public static ImagensProdutoDto ImagensParaDto(this Produto produto) =>
+        new(produto.ImagemInteiro?.ParaDto(), produto.ImagemPartido?.ParaDto());
 
     private static ImagemDto ParaDto(this Imagem imagem) => new(imagem.Caminho, imagem.TextoAlternativo);
 }

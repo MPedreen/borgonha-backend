@@ -30,4 +30,16 @@ public sealed class CategoriaTests
     {
         Assert.Throws<DominioException>(() => Categoria.Criar(Slug.Criar("cookies"), "Cookies", -1));
     }
+
+    [Fact]
+    public void ProdutoNovoEntraDepoisDeTodos()
+    {
+        var categoria = Categoria.Criar(Slug.Criar("cookies"), "Cookies", 0);
+        Assert.Equal(0, categoria.ProximaOrdem());
+
+        categoria.AdicionarProduto(Produto.Criar(Slug.Criar("nutella"), "Nutella", "Recheio de Nutella.", 4));
+        categoria.AdicionarProduto(Produto.Criar(Slug.Criar("bueno"), "Kinder Bueno", "Recheio de Kinder Bueno.", 1));
+
+        Assert.Equal(5, categoria.ProximaOrdem());
+    }
 }

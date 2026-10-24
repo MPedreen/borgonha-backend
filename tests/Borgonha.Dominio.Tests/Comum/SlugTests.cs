@@ -43,4 +43,31 @@ public sealed class SlugTests
     {
         Assert.Equal(Slug.Criar("nutella"), Slug.Criar("nutella"));
     }
+
+    [Theory]
+    [InlineData("Brigadeiro de Maracujá", "brigadeiro-de-maracuja")]
+    [InlineData("  Pão de Mel  ", "pao-de-mel")]
+    [InlineData("M&M", "m-m")]
+    [InlineData("Cookie Nº 1!", "cookie-n-1")]
+    [InlineData("!!!", "produto")]
+    public void GeraSlugAPartirDeUmTextoLivre(string texto, string esperado)
+    {
+        Assert.Equal(esperado, Slug.GerarAPartirDe(texto).Valor);
+    }
+
+    [Fact]
+    public void LimitaOSlugGeradoAoTamanhoMaximo()
+    {
+        var slug = Slug.GerarAPartirDe(string.Join(' ', Enumerable.Repeat("chocolate", 20)));
+
+        Assert.True(slug.Valor.Length <= Slug.TamanhoMaximo);
+        Assert.False(slug.Valor.EndsWith('-'));
+    }
+
+    [Fact]
+    public void AcrescentaSufixoNumerico()
+    {
+        Assert.Equal("brookie-2", Slug.Criar("brookie").ComSufixo(2).Valor);
+        Assert.True(Slug.GerarAPartirDe(new string('a', Slug.TamanhoMaximo)).ComSufixo(12).Valor.Length <= Slug.TamanhoMaximo);
+    }
 }

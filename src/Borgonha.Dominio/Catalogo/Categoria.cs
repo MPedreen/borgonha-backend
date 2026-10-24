@@ -48,4 +48,9 @@ public sealed class Categoria
 
         _produtos.Add(produto);
     }
+
+    /// <summary>
+    /// Posição de um produto novo: depois de todos os que já existem.
+    /// </summary>
+    public int ProximaOrdem() => _produtos.Count == 0 ? 0 : _produtos.Max(produto => produto.Ordem) + 1;
 }

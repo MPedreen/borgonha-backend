@@ -86,4 +86,66 @@ public sealed class ProdutoTests
         produto.MarcarComoDisponivel();
         Assert.True(produto.Disponivel);
     }
+
+    [Fact]
+    public void ProdutoNovoEstaNoCardapio()
+    {
+        Assert.Equal(SituacaoProduto.NoCardapio, CriarProduto().Situacao);
+    }
+
+    [Theory]
+    [InlineData(SituacaoProduto.NoCardapio, true, true)]
+    [InlineData(SituacaoProduto.Esgotado, true, false)]
+    [InlineData(SituacaoProduto.Oculto, false, true)]
+    public void DefineASituacao(SituacaoProduto situacao, bool ativo, bool disponivel)
+    {
+        var produto = CriarProduto();
+        produto.DefinirSituacao(SituacaoProduto.Esgotado);
+
+        produto.DefinirSituacao(situacao);
+
+        Assert.Equal(situacao, produto.Situacao);
+        Assert.Equal(ativo, produto.Ativo);
+        Assert.Equal(disponivel, produto.Disponivel);
+    }
+
+    [Fact]
+    public void RecusaSituacaoInexistente()
+    {
+        Assert.Throws<DominioException>(() => CriarProduto().DefinirSituacao((SituacaoProduto)42));
+    }
+
+    [Fact]
+    public void AtualizaOsTextosSemMudarOSlug()
+    {
+        var produto = CriarProduto();
+
+        produto.Atualizar(" Pistache ", "Recheio de pistache.", null, "130g", ["", " Inteiro "]);
+
+        Assert.Equal("red-velvet", produto.Slug.Valor);
+        Assert.Equal("Pistache", produto.Nome);
+        Assert.Equal("Recheio de pistache.", produto.Descricao);
+        Assert.Null(produto.Frase);
+        Assert.Equal("130g", produto.Peso);
+        Assert.Equal(["Inteiro"], produto.Variacoes);
+    }
+
+    [Fact]
+    public void ValidaOsTextosAoAtualizar()
+    {
+        Assert.Throws<DominioException>(() => CriarProduto().Atualizar("Red Velvet", " ", null, null, null));
+    }
+
+    [Fact]
+    public void TrocaERemoveAsFotos()
+    {
+        var produto = CriarProduto();
+
+        produto.TrocarImagemInteiro(new Imagem("envios/abc", "Cookie Red Velvet"));
+        produto.TrocarImagemPartido(new Imagem("envios/def", "Cookie Red Velvet partido ao meio"));
+        produto.TrocarImagemPartido(null);
+
+        Assert.Equal("envios/abc", produto.ImagemInteiro?.Caminho);
+        Assert.Null(produto.ImagemPartido);
+    }
 }

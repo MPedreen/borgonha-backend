@@ -62,7 +62,20 @@ public sealed class Produto
     /// </summary>
     public Imagem? ImagemPartido { get; private set; }
 
+    /// <summary>
+    /// Falso quando o produto esgotou: continua no site, com o aviso "Esgotado hoje".
+    /// </summary>
     public bool Disponivel { get; private set; } = true;
+
+    /// <summary>
+    /// Falso quando o produto saiu do cardápio da semana: some do site até voltar.
+    /// </summary>
+    public bool Ativo { get; private set; } = true;
+
+    public SituacaoProduto Situacao =>
+        !Ativo ? SituacaoProduto.Oculto
+        : Disponivel ? SituacaoProduto.NoCardapio
+        : SituacaoProduto.Esgotado;
 
     public int Ordem { get; private set; }
 
@@ -79,18 +92,45 @@ public sealed class Produto
     {
         ArgumentNullException.ThrowIfNull(slug);
 
-        return new Produto
+        var produto = new Produto
         {
             Slug = slug,
-            Nome = Garantir.TextoObrigatorio(nome, "Nome do produto", TamanhoMaximoNome),
-            Descricao = Garantir.TextoObrigatorio(descricao, "Descrição do produto", TamanhoMaximoDescricao),
-            Frase = Garantir.TextoOpcional(frase, "Frase do produto", TamanhoMaximoFrase),
-            Peso = Garantir.TextoOpcional(peso, "Peso do produto", TamanhoMaximoPeso),
-            Variacoes = [.. (variacoes ?? []).Select(variacao => Garantir.TextoObrigatorio(variacao, "Variação do produto", TamanhoMaximoVariacao))],
             ImagemInteiro = imagemInteiro,
             ImagemPartido = imagemPartido,
             Ordem = Garantir.NaoNegativo(ordem, "Ordem do produto"),
         };
+        produto.Atualizar(nome, descricao, frase, peso, variacoes);
+
+        return produto;
+    }
+
+    /// <summary>
+    /// Troca os textos do produto (o slug continua o mesmo, para não quebrar links e âncoras).
+    /// </summary>
+    public void Atualizar(string nome, string descricao, string? frase, string? peso, IEnumerable<string>? variacoes)
+    {
+        Nome = Garantir.TextoObrigatorio(nome, "Nome do produto", TamanhoMaximoNome);
+        Descricao = Garantir.TextoObrigatorio(descricao, "Descrição do produto", TamanhoMaximoDescricao);
+        Frase = Garantir.TextoOpcional(frase, "Frase do produto", TamanhoMaximoFrase);
+        Peso = Garantir.TextoOpcional(peso, "Peso do produto", TamanhoMaximoPeso);
+        Variacoes = [.. (variacoes ?? [])
+            .Where(variacao => !string.IsNullOrWhiteSpace(variacao))
+            .Select(variacao => Garantir.TextoObrigatorio(variacao, "Variação do produto", TamanhoMaximoVariacao))];
+    }
+
+    public void TrocarImagemInteiro(Imagem? imagem) => ImagemInteiro = imagem;
+
+    public void TrocarImagemPartido(Imagem? imagem) => ImagemPartido = imagem;
+
+    public void DefinirSituacao(SituacaoProduto situacao)
+    {
+        if (!Enum.IsDefined(situacao))
+        {
+            throw new DominioException("Situação do produto inválida.");
+        }
+
+        Ativo = situacao != SituacaoProduto.Oculto;
+        Disponivel = situacao != SituacaoProduto.Esgotado;
     }
 
     public void DefinirPreco(decimal? preco)

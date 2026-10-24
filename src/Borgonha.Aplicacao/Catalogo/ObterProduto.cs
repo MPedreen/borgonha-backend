@@ -4,7 +4,9 @@ namespace Borgonha.Aplicacao.Catalogo;
 
 public sealed class ObterProduto(ICatalogoRepositorio repositorio)
 {
-    /// <returns>O produto, ou <see langword="null"/> se o slug for inválido ou não existir.</returns>
+    /// <returns>
+    /// O produto, ou <see langword="null"/> se o slug for inválido, não existir ou o produto estiver fora do cardápio.
+    /// </returns>
     public async Task<ProdutoDto?> ExecutarAsync(string slug, CancellationToken cancellationToken)
     {
         if (!Slug.TentarCriar(slug, out var slugValido))
@@ -14,6 +16,6 @@ public sealed class ObterProduto(ICatalogoRepositorio repositorio)
 
         var produto = await repositorio.ObterProdutoAsync(slugValido, cancellationToken).ConfigureAwait(false);
 
-        return produto?.ParaDto(produto.Categoria.Slug);
+        return produto is { Ativo: true } ? produto.ParaDto(produto.Categoria.Slug) : null;
     }
 }

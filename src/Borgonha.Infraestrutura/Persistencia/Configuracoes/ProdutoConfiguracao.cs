@@ -22,6 +22,7 @@ internal sealed class ProdutoConfiguracao : IEntityTypeConfiguration<Produto>
         builder.Property(produto => produto.Peso).HasMaxLength(Produto.TamanhoMaximoPeso);
         builder.Property(produto => produto.Selo).HasMaxLength(Produto.TamanhoMaximoSelo);
         builder.PrimitiveCollection(produto => produto.Variacoes);
+        builder.Ignore(produto => produto.Situacao);
 
         builder.OwnsOne(produto => produto.ImagemInteiro, imagem => ConfigurarImagem(imagem, "ImagemInteiro"));
         builder.OwnsOne(produto => produto.ImagemPartido, imagem => ConfigurarImagem(imagem, "ImagemPartido"));
