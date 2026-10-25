@@ -30,6 +30,8 @@ Os passos 1 a 3 são só da primeira vez. Nas próximas, basta o Docker estar li
 
 Na primeira execução, a API cria as tabelas (migrations) e cadastra o cardápio, a loja e as dúvidas (`src/Borgonha.Infraestrutura/Persistencia/DadosIniciais.cs`). Esses dados só entram com o banco vazio.
 
+Nessa primeira partida o log mostra um `fail` do EF Core sobre a tabela `__EFMigrationsHistory`. É esperado: o EF consulta uma tabela que ainda não existe e, logo em seguida, aplica a migration.
+
 ## Endpoints
 
 ### Site
