@@ -2,21 +2,33 @@
 
 API do site da Borgonha Confeitaria (Santa Luzia, São Gonçalo – RJ): cardápio, dados da loja e dúvidas frequentes. O site fica no repositório [borgonha-frontend](https://github.com/MPedreen/borgonha-frontend).
 
-.NET 10 LTS · Minimal APIs · Clean Architecture · EF Core 10 + SQLite · xUnit v3
+.NET 10 LTS · Minimal APIs · Clean Architecture · EF Core 10 + PostgreSQL · xUnit v3
 
 ## Como rodar
 
-Pré-requisito: [.NET SDK 10](https://dotnet.microsoft.com/download/dotnet/10.0) (versão definida em `global.json`).
+Pré-requisitos: [.NET SDK 10](https://dotnet.microsoft.com/download/dotnet/10.0) (versão definida em `global.json`) e [Docker](https://www.docker.com/products/docker-desktop/), que roda o PostgreSQL.
 
 ```bash
+# 1. Senha do banco: copie o modelo e troque a senha dentro do .env (o Git ignora esse arquivo)
+cp .env.exemplo .env
+
+# 2. Sobe o PostgreSQL em 127.0.0.1:5432
+docker compose up -d
+
+# 3. Entrega a connection string à API, fora do repositório (use a senha do .env)
+dotnet user-secrets set "ConnectionStrings:Borgonha" "Host=localhost;Port=5432;Database=borgonha;Username=borgonha;Password=<senha do .env>" --project src/Borgonha.Api
+
+# 4. Roda a API
 dotnet run --project src/Borgonha.Api
 ```
+
+Os passos 1 a 3 são só da primeira vez. Nas próximas, basta o Docker estar ligado: o banco sobe sozinho com ele, ou com `docker compose up -d`.
 
 - API: http://localhost:5170
 - Documentação interativa (Scalar): http://localhost:5170/scalar
 - Exemplos de requisições: `src/Borgonha.Api/Borgonha.Api.http`
 
-Na primeira execução, a API cria o banco SQLite em `src/Borgonha.Api/dados/borgonha.db`, já com o cardápio, a loja e as dúvidas (`src/Borgonha.Infraestrutura/Persistencia/DadosIniciais.cs`). Esses dados só entram com o banco vazio: para recriá-lo, apague o arquivo.
+Na primeira execução, a API cria as tabelas (migrations) e cadastra o cardápio, a loja e as dúvidas (`src/Borgonha.Infraestrutura/Persistencia/DadosIniciais.cs`). Esses dados só entram com o banco vazio.
 
 ## Endpoints
 
@@ -78,7 +90,38 @@ Outras proteções:
 
 ### Pasta `dados/`
 
-Guarda o banco, as fotos enviadas (`dados/imagens`) e as chaves que protegem o cookie da sessão (`dados/chaves`). Precisa ser **persistente** na hospedagem e entrar no backup. Nunca deve ir para o Git: as chaves permitiriam forjar uma sessão.
+Guarda as fotos enviadas (`dados/imagens`) e as chaves que protegem o cookie da sessão (`dados/chaves`); o banco fica no PostgreSQL, fora dela. Precisa ser **persistente** na hospedagem e entrar no backup, junto com o banco. Nunca deve ir para o Git: as chaves permitiriam forjar uma sessão.
+
+## Banco de dados
+
+PostgreSQL 18, acessado pelo EF Core com o provedor Npgsql. Tabelas e colunas usam snake_case (`produtos`, `categoria_id`), então consultas escritas à mão não precisam de aspas.
+
+- **Desenvolvimento:** o `docker-compose.yml` sobe o banco em `127.0.0.1:5432`, visível só nesta máquina. O usuário e o banco se chamam `borgonha`, e a senha vem do `.env`, que o Git ignora (o `.env.exemplo` mostra o formato). A API recebe a connection string pelos user-secrets, como o usuário do administrador: ela nunca fica no `appsettings.json` nem no Git.
+- **Produção:** variável de ambiente `ConnectionStrings__Borgonha` (ou o cofre de segredos da hospedagem), com um banco e uma senha só da produção. Prefira o PostgreSQL gerenciado da hospedagem, que já faz backup.
+- **Migrations:** a API aplica as que faltam ao iniciar (`BancoDeDados:AplicarMigracoesNaInicializacao`).
+
+A senha do `.env` vale só na criação do banco. Para trocá-la depois, rode `ALTER USER borgonha PASSWORD '...'` no `psql` e atualize os user-secrets, ou recrie o banco como mostra abaixo.
+
+```bash
+docker compose up -d             # liga o banco
+docker compose down              # desliga (os dados ficam guardados no volume)
+docker compose down --volumes    # desliga e APAGA o banco: a API o recria do zero na próxima partida
+docker compose exec banco psql --username=borgonha borgonha
+```
+
+### Backup
+
+```bash
+# Gera borgonha.dump nesta pasta
+docker compose exec banco sh -c "pg_dump --username=borgonha --format=custom --file=/tmp/borgonha.dump borgonha"
+docker compose cp banco:/tmp/borgonha.dump ./borgonha.dump
+
+# Restaura, trocando o conteúdo atual do banco
+docker compose cp ./borgonha.dump banco:/tmp/borgonha.dump
+docker compose exec banco sh -c "pg_restore --username=borgonha --dbname=borgonha --clean --if-exists /tmp/borgonha.dump"
+```
+
+Guarde o `.dump` junto com a pasta `dados/`, fora do Git (o `.gitignore` já ignora `*.dump`).
 
 ## Organização
 
@@ -86,10 +129,10 @@ Guarda o banco, as fotos enviadas (`dados/imagens`) e as chaves que protegem o c
 |---|---|
 | `src/Borgonha.Dominio` | Entidades e regras: catálogo, loja e dúvidas |
 | `src/Borgonha.Aplicacao` | Casos de uso (consultas do site e edição do cardápio) e DTOs |
-| `src/Borgonha.Infraestrutura` | EF Core + SQLite (mapeamentos, migrations, repositórios e dados iniciais) e fotos otimizadas com SkiaSharp |
+| `src/Borgonha.Infraestrutura` | EF Core + PostgreSQL (mapeamentos, migrations, repositórios e dados iniciais) e fotos otimizadas com SkiaSharp |
 | `src/Borgonha.Api` | Endpoints, autenticação do administrador, ProblemDetails, CORS, cache, compressão, health check e OpenAPI |
 | `tests/Borgonha.Dominio.Tests` | Testes das regras de domínio |
-| `tests/Borgonha.Api.Tests` | Testes de integração (WebApplicationFactory + SQLite em memória) |
+| `tests/Borgonha.Api.Tests` | Testes de integração (WebApplicationFactory + PostgreSQL em contêiner, via Testcontainers) |
 
 ## Testes e qualidade
 
@@ -98,13 +141,15 @@ dotnet test                         # testes de domínio e de integração
 dotnet format --verify-no-changes   # formatação e estilo
 ```
 
+Os testes de integração sobem um PostgreSQL descartável em contêiner (Testcontainers), então o Docker precisa estar ligado. Eles não tocam no banco de desenvolvimento.
+
 O build trata avisos como erros (`Directory.Build.props`), e as versões dos pacotes ficam centralizadas em `Directory.Packages.props`. O CI (`.github/workflows/ci.yml`) roda formatação, build e testes a cada push na `main` e em cada pull request.
 
 ## Configuração
 
 | Chave | Padrão | Para que serve |
 |---|---|---|
-| `ConnectionStrings:Borgonha` | `Data Source=dados/borgonha.db` | Banco SQLite |
+| `ConnectionStrings:Borgonha` | nenhum (só user-secrets ou variável de ambiente) | Connection string do PostgreSQL |
 | `Cors:OrigensPermitidas` | vazio (em desenvolvimento, `http://localhost:4200`) | Endereços do site que podem chamar a API |
 | `BancoDeDados:AplicarMigracoesNaInicializacao` | `true` | Cria ou atualiza o banco ao iniciar |
 | `Armazenamento:PastaDasImagens` | `dados/imagens` | Fotos enviadas pela área do administrador |
