@@ -1,0 +1,28 @@
+# PostgreSQL para rodar a API na sua máquina (o passo a passo está no README):
+#   cp .env.exemplo .env      # e troque a senha dentro do .env
+#   docker compose up -d
+name: borgonha
+
+services:
+  banco:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: borgonha
+      POSTGRES_USER: borgonha
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Copie .env.exemplo para .env e defina POSTGRES_PASSWORD}
+    ports:
+      # Só esta máquina enxerga o banco.
+      - "127.0.0.1:5432:5432"
+    volumes:
+      # A imagem do PostgreSQL 18 guarda os dados em /var/lib/postgresql/18/docker.
+      - dados-do-banco:/var/lib/postgresql
+    healthcheck:
+      # Por TCP: na criação do banco, o servidor temporário só atende pelo socket e ainda não conta como pronto.
+      test: ["CMD-SHELL", "pg_isready --host=127.0.0.1 --username=borgonha --dbname=borgonha"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+volumes:
+  dados-do-banco:

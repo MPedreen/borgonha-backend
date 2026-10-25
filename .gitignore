@@ -15,6 +15,14 @@ src/Borgonha.Api/dados/
 *.db-shm
 *.db-wal
 
+# Senha do PostgreSQL local (docker-compose.yml). O que vai para o Git é só o .env.exemplo
+.env
+.env.*
+!.env.exemplo
+
+# Backups do banco (pg_dump)
+*.dump
+
 # Sistema
 .DS_Store
 Thumbs.db
