@@ -34,4 +34,31 @@ public sealed class RegraDeEntregaTests
 
         Assert.Throws<DominioException>(() => new RegraDeEntrega(1_500, pedidoMinimo));
     }
+
+    [Theory]
+    [InlineData(1_000, null)]
+    [InlineData(1_750, null)]
+    [InlineData(1_751, SituacaoDaEntrega.ComPedidoMinimo)]
+    [InlineData(5_000, SituacaoDaEntrega.ComPedidoMinimo)]
+    [InlineData(5_001, SituacaoDaEntrega.ForaDoAlcance)]
+    public void LinhaRetaDecideSoQuandoJaBasta(int distancia, SituacaoDaEntrega? esperada)
+    {
+        var regra = new RegraDeEntrega(1_500, 30m);
+
+        Assert.Equal(esperada, regra.AvaliarPelaLinhaReta(distancia));
+    }
+
+    [Theory]
+    [InlineData(900, SituacaoDaEntrega.SemPedidoMinimo)]
+    [InlineData(1_249, SituacaoDaEntrega.SemPedidoMinimo)]
+    [InlineData(1_250, SituacaoDaEntrega.Incerta)]
+    [InlineData(1_500, SituacaoDaEntrega.Incerta)]
+    [InlineData(1_750, SituacaoDaEntrega.Incerta)]
+    [InlineData(1_751, SituacaoDaEntrega.ComPedidoMinimo)]
+    public void TrajetoPertoDoLimiteFicaIncerto(int distancia, SituacaoDaEntrega esperada)
+    {
+        var regra = new RegraDeEntrega(1_500, 30m);
+
+        Assert.Equal(esperada, regra.AvaliarPeloTrajeto(distancia));
+    }
 }
