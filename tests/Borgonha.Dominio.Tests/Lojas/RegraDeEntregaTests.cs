@@ -51,11 +51,11 @@ public sealed class RegraDeEntregaTests
     [Theory]
     [InlineData(900, SituacaoDaEntrega.SemPedidoMinimo)]
     [InlineData(1_249, SituacaoDaEntrega.SemPedidoMinimo)]
-    [InlineData(1_250, SituacaoDaEntrega.Incerta)]
-    [InlineData(1_500, SituacaoDaEntrega.Incerta)]
-    [InlineData(1_750, SituacaoDaEntrega.Incerta)]
+    [InlineData(1_250, SituacaoDaEntrega.SemPedidoMinimo)]
+    [InlineData(1_500, SituacaoDaEntrega.SemPedidoMinimo)]
+    [InlineData(1_750, SituacaoDaEntrega.SemPedidoMinimo)]
     [InlineData(1_751, SituacaoDaEntrega.ComPedidoMinimo)]
-    public void TrajetoPertoDoLimiteFicaIncerto(int distancia, SituacaoDaEntrega esperada)
+    public void TrajetoPertoDoLimiteNaoTemPedidoMinimo(int distancia, SituacaoDaEntrega esperada)
     {
         var regra = new RegraDeEntrega(1_500, 30m);
 

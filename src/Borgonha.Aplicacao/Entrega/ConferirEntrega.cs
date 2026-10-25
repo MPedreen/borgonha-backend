@@ -34,7 +34,8 @@ public sealed class ConferirEntrega(ILojaRepositorio lojas, IRotas rotas)
         }
         catch (RotaNaoEncontradaException)
         {
-            return new ResultadoDaEntregaDto(Texto(SituacaoDaEntrega.Incerta), null, linhaReta);
+            // Sem trajeto, vale a linha reta, que aqui está dentro do raio com a tolerância.
+            return new ResultadoDaEntregaDto(Texto(SituacaoDaEntrega.SemPedidoMinimo), null, linhaReta);
         }
     }
 
@@ -43,7 +44,6 @@ public sealed class ConferirEntrega(ILojaRepositorio lojas, IRotas rotas)
         {
             SituacaoDaEntrega.SemPedidoMinimo => "sem-minimo",
             SituacaoDaEntrega.ComPedidoMinimo => "com-minimo",
-            SituacaoDaEntrega.Incerta => "incerta",
             SituacaoDaEntrega.ForaDoAlcance => "fora-da-regiao",
             _ => throw new ArgumentOutOfRangeException(nameof(situacao), situacao, "Situação sem representação na API."),
         };

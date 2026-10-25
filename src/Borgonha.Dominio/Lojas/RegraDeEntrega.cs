@@ -15,10 +15,10 @@ public sealed record RegraDeEntrega
     public const int AlcanceEmMetros = 5_000;
 
     /// <summary>
-    /// Folga em volta do raio. Os mapas gratuitos estimam o número da casa ao longo da rua, com erro de
-    /// algumas centenas de metros: dentro dessa folga, a resposta seria um palpite.
+    /// Folga a favor do cliente além do raio. Os mapas gratuitos estimam o número da casa ao longo da rua, com
+    /// erro de algumas centenas de metros: quem está "perto de 1,5 km" fica sem pedido mínimo.
     /// </summary>
-    public const int MargemDeIncertezaEmMetros = 250;
+    public const int ToleranciaEmMetros = 250;
 
     public RegraDeEntrega(int raioSemPedidoMinimoEmMetros, decimal pedidoMinimo)
     {
@@ -52,7 +52,7 @@ public sealed record RegraDeEntrega
             return SituacaoDaEntrega.ForaDoAlcance;
         }
 
-        return distanciaEmMetros > RaioSemPedidoMinimoEmMetros + MargemDeIncertezaEmMetros
+        return distanciaEmMetros > RaioSemPedidoMinimoEmMetros + ToleranciaEmMetros
             ? SituacaoDaEntrega.ComPedidoMinimo
             : null;
     }
@@ -60,12 +60,7 @@ public sealed record RegraDeEntrega
     /// <summary>Decide pela distância do trajeto de entrega.</summary>
     public SituacaoDaEntrega AvaliarPeloTrajeto(int distanciaEmMetros)
     {
-        if (Math.Abs(distanciaEmMetros - RaioSemPedidoMinimoEmMetros) <= MargemDeIncertezaEmMetros)
-        {
-            return SituacaoDaEntrega.Incerta;
-        }
-
-        return distanciaEmMetros < RaioSemPedidoMinimoEmMetros
+        return distanciaEmMetros <= RaioSemPedidoMinimoEmMetros + ToleranciaEmMetros
             ? SituacaoDaEntrega.SemPedidoMinimo
             : SituacaoDaEntrega.ComPedidoMinimo;
     }

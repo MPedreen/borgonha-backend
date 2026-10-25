@@ -79,13 +79,14 @@ public sealed class EntregaEndpointsTests(BorgonhaApiFactory fabrica) : IClassFi
     }
 
     [Fact]
-    public async Task EnderecoPertoDoLimiteFicaIncerto()
+    public async Task EnderecoPertoDoLimiteFicaSemPedidoMinimo()
     {
         fabrica.Mapas.Reiniciar();
 
         var resultado = await ConferirAsync(AoSul(1_150));
 
-        Assert.Equal("incerta", resultado.Situacao);
+        // 1,15 km em linha reta, 1,5 km pelas ruas: perto de 1,5 km, sem pedido mínimo.
+        Assert.Equal("sem-minimo", resultado.Situacao);
     }
 
     [Fact]
@@ -112,14 +113,14 @@ public sealed class EntregaEndpointsTests(BorgonhaApiFactory fabrica) : IClassFi
     }
 
     [Fact]
-    public async Task SemTrajetoAteOPontoOResultadoFicaIncerto()
+    public async Task SemTrajetoAteOPontoValeALinhaReta()
     {
         fabrica.Mapas.Reiniciar();
         fabrica.Mapas.SemTrajeto = true;
 
         var resultado = await ConferirAsync(AoSul(800));
 
-        Assert.Equal("incerta", resultado.Situacao);
+        Assert.Equal("sem-minimo", resultado.Situacao);
         Assert.Null(resultado.DistanciaEmMetros);
     }
 
