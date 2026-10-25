@@ -22,3 +22,11 @@ Accept: application/json
 
 ### Saúde da API e do banco
 GET {{Api}}/health
+
+### Entrega: sugestões de endereço (gasta 1 crédito do Geoapify; repetidas vêm do cache)
+GET {{Api}}/api/entrega/enderecos?texto=Rua%20Afr%C3%A2nio%20Peixoto%2040
+Accept: application/json
+
+### Entrega: confere se o ponto tem pedido mínimo (latitude e longitude de uma sugestão)
+GET {{Api}}/api/entrega/conferir?latitude=-22.8105&longitude=-42.9805
+Accept: application/json

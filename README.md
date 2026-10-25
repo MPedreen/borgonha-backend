@@ -44,6 +44,8 @@ Todos são `GET` e respondem JSON. As rotas ficam 5 minutos em cache, e qualquer
 | `/api/catalogo/{slug}` | Um produto; 404 em ProblemDetails se não existir ou estiver oculto |
 | `/api/loja` | Endereço, horários, Instagram, canais de pedido (WhatsApp, iFood e loja física) e a regra de entrega (`entrega`: raio sem pedido mínimo, em metros, e o valor do pedido mínimo) |
 | `/api/duvidas` | Perguntas frequentes |
+| `/api/entrega/enderecos?texto=` | Sugestões de endereço para o cliente conferir a entrega (mínimo de 4 letras). Não passa pelo cache do site; 503 se o serviço de mapas estiver indisponível |
+| `/api/entrega/conferir?latitude=&longitude=` | Diz se a entrega no ponto tem pedido mínimo: `sem-minimo`, `com-minimo`, `incerta` ou `fora-da-regiao`, com a distância. Mesmas regras do endereço acima |
 | `/api/imagens/envios/{arquivo}.webp` | Fotos enviadas pela área do administrador |
 | `/health` | Saúde da API e do banco |
 
@@ -90,15 +92,23 @@ Outras proteções:
 - **CSRF:** além do `SameSite=Strict`, toda chamada exige o cabeçalho `X-Borgonha-Admin`, que outros sites não conseguem enviar (o CORS só libera as origens configuradas).
 - **Fotos:** a API abre e regrava cada foto em WebP. Arquivos que não são imagem são recusados, e metadados como a localização do celular não chegam ao site.
 
-### Regra de entrega
+### Entrega e pedido mínimo
 
-Até 1,5 km da loja, em linha reta, a entrega não tem pedido mínimo; mais longe, o pedido mínimo é de R$ 30. Os valores ficam na tabela `lojas` e ainda não têm tela na área do administrador. Para mudar:
+Até 1,5 km da loja, **pelo trajeto de entrega**, não há pedido mínimo; mais longe, o pedido mínimo é de R$ 30. O raio e o valor ficam na tabela `lojas` (ainda sem tela na área do administrador). Para mudar:
 
 ```sql
 UPDATE lojas SET entrega_raio_sem_pedido_minimo_em_metros = 1500, entrega_pedido_minimo = 30;
 ```
 
-Depois, atualize a dúvida "Tem pedido mínimo para entrega?" (tabela `duvidas`) e gere de novo a lista de ruas do site (`npm run ruas-entrega` no frontend).
+Depois, atualize a dúvida "Tem pedido mínimo para entrega?" (tabela `duvidas`).
+
+Para conferir o endereço do cliente, a API usa o [Geoapify](https://www.geoapify.com/) (plano gratuito: 3.000 créditos por dia, sem cartão): o `/api/entrega/enderecos` sugere endereços (autocompletar) e o `/api/entrega/conferir` calcula o trajeto. O navegador nunca fala com o Geoapify: a chave fica na API.
+
+- **Chave:** crie a conta e a chave em geoapify.com. Em desenvolvimento, `dotnet user-secrets set "Geoapify:Chave" "<chave>" --project src/Borgonha.Api`; em produção, a variável de ambiente `Geoapify__Chave`. Nunca vai para o Git. Sem chave, a consulta responde "indisponível" (503) e o site pede para confirmar pelo WhatsApp.
+- **Regra de decisão** (`RegraDeEntrega`): se a distância em linha reta já passa de raio + 250 m, o pedido mínimo vale sem gastar o cálculo do trajeto; senão, calcula-se o trajeto. Os mapas gratuitos estimam o número da casa com erro de algumas centenas de metros, então um trajeto a menos de 250 m do raio vira `incerta` ("confirme pelo WhatsApp"). Além de 5 km em linha reta, `fora-da-regiao`.
+- **Para não gastar crédito à toa:** cada endereço consultado fica 24 horas em cache (trajetos, 7 dias), o que vale para todos os clientes; o site só busca depois que a pessoa para de digitar e com pelo menos 4 letras; há um limite de 30 consultas por minuto por endereço IP (`Entrega:ConsultasPorMinutoPorEndereco`); e a API conta os créditos do dia (UTC) e para em 2.700 (`Geoapify:CreditosPorDia`), porque o Geoapify não bloqueia ao passar de 3.000: ele pede upgrade e pode suspender a conta. A contagem fica na memória e recomeça se a API reiniciar. Uma recusa 429 do Geoapify pausa as chamadas por 1 minuto.
+- **Quando não dá para consultar** (sem chave, limite do dia, serviço fora do ar ou lento): 503 com a mensagem "A conferência de endereço está temporariamente indisponível. Fale com a gente pelo WhatsApp." O site mostra o aviso com o botão do WhatsApp e, enquanto isso, deixa procurar pelo nome da rua numa lista que vai junto com o site (estimativa em linha reta).
+- **Privacidade e crédito:** os endereços digitados passam pelo Geoapify (por isso o log de `System.Net.Http.HttpClient` fica em Warning: a URL leva o endereço). O site mostra o crédito exigido pelo plano gratuito ("Geoapify" e "© colaboradores do OpenStreetMap"). Leia os termos de uso comercial do plano gratuito ao criar a conta.
 
 ### Pasta `dados/`
 
@@ -166,6 +176,9 @@ O build trata avisos como erros (`Directory.Build.props`), e as versões dos pac
 | `BancoDeDados:AplicarMigracoesNaInicializacao` | `true` | Cria ou atualiza o banco ao iniciar |
 | `Armazenamento:PastaDasImagens` | `dados/imagens` | Fotos enviadas pela área do administrador |
 | `Armazenamento:PastaDasChaves` | `dados/chaves` | Chaves que protegem o cookie da sessão |
+| `Geoapify:Chave` | nenhum (só user-secrets ou variável de ambiente) | Chave do Geoapify para a consulta de entrega |
+| `Geoapify:CreditosPorDia` | `2700` | Créditos que a API pode gastar por dia (UTC); o plano gratuito dá 3.000 |
+| `Entrega:ConsultasPorMinutoPorEndereco` | `30` | Consultas de entrega aceitas por minuto de cada endereço IP |
 | `Administrador:Usuario` e `Administrador:SenhaHash` | nenhum (só user-secrets ou variáveis de ambiente) | Acesso à área do administrador |
 | `Administrador:TentativasPorEndereco` / `TentativasPorHora` | `5` / `20` | Limites de tentativas de login |
 | `Administrador:DuracaoDaSessao` | `08:00:00` | Tempo da sessão sem uso |
