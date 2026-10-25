@@ -1,4 +1,5 @@
 using Borgonha.Aplicacao.Administracao;
+using Borgonha.Aplicacao.Entrega;
 using Borgonha.Dominio.Comum;
 using Microsoft.AspNetCore.Diagnostics;
 
@@ -17,6 +18,9 @@ internal sealed partial class TratadorDeExcecoes(
         var (status, titulo) = exception switch
         {
             DominioException or ImagemInvalidaException => (StatusCodes.Status400BadRequest, exception.Message),
+            MapasIndisponiveisException => (
+                StatusCodes.Status503ServiceUnavailable,
+                "A conferência de endereço está temporariamente indisponível. Fale com a gente pelo WhatsApp."),
             BadHttpRequestException { StatusCode: StatusCodes.Status413PayloadTooLarge } =>
                 (StatusCodes.Status413PayloadTooLarge, "O arquivo enviado é grande demais."),
             BadHttpRequestException requisicaoInvalida => (requisicaoInvalida.StatusCode, "Requisição inválida."),

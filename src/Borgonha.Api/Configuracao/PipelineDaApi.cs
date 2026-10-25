@@ -23,6 +23,7 @@ internal static class PipelineDaApi
         app.UseResponseCompression();
         app.UsarImagensEnviadas(pastaDasImagens);
         app.UseCors();
+        app.UseRateLimiter();
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseOutputCache();

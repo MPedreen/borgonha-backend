@@ -1,12 +1,16 @@
 using Borgonha.Aplicacao.Administracao;
 using Borgonha.Aplicacao.Catalogo;
 using Borgonha.Aplicacao.Duvidas;
+using Borgonha.Aplicacao.Entrega;
 using Borgonha.Aplicacao.Lojas;
 using Borgonha.Infraestrutura.Imagens;
+using Borgonha.Infraestrutura.Mapas;
 using Borgonha.Infraestrutura.Persistencia;
 using Borgonha.Infraestrutura.Repositorios;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace Borgonha.Infraestrutura;
 
@@ -34,9 +38,32 @@ public static class ServicosDaInfraestrutura
         services.AddSingleton(new OpcoesDasImagens(pastaDasImagens));
         services.AddSingleton<IArmazenamentoDeImagens, ArmazenamentoDeImagensEmDisco>();
 
+        AdicionarMapas(services);
+
         services.AddHealthChecks().AddDbContextCheck<BorgonhaDbContext>("banco-de-dados");
 
         return services;
+    }
+
+    private static void AdicionarMapas(IServiceCollection services)
+    {
+        services.AddOptions<OpcoesDaGeoapify>()
+            .BindConfiguration(OpcoesDaGeoapify.Secao)
+            .Validate(opcoes => opcoes.EhValida(), "Geoapify: CreditosPorDia e TempoLimite devem ser positivos e UrlBase deve ser HTTPS.")
+            .ValidateOnStart();
+
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddSingleton<ControleDeCreditos>();
+        services.AddSingleton<CacheDeMapas>();
+
+        services.AddHttpClient<ClienteGeoapify>((provedor, cliente) =>
+        {
+            var opcoes = provedor.GetRequiredService<IOptions<OpcoesDaGeoapify>>().Value;
+            cliente.BaseAddress = opcoes.UrlBase;
+            cliente.Timeout = opcoes.TempoLimite;
+        });
+        services.AddTransient<IGeocodificador>(provedor => provedor.GetRequiredService<ClienteGeoapify>());
+        services.AddTransient<IRotas>(provedor => provedor.GetRequiredService<ClienteGeoapify>());
     }
 
     /// <summary>

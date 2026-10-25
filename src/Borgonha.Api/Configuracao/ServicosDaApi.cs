@@ -38,6 +38,7 @@ internal static class ServicosDaApi
             .AllowCredentials()));
 
         services.AdicionarAutenticacaoDoAdministrador(configuracao, ambiente, pastaDasChaves);
+        services.AdicionarLimiteDeConsultasDeEntrega(configuracao);
 
         return services;
     }

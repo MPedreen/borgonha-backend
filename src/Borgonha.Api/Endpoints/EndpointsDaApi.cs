@@ -12,7 +12,9 @@ internal static class EndpointsDaApi
         api.MapearLoja();
         api.MapearDuvidas();
 
-        // Fora do grupo /api: nada da área do administrador passa pelo cache.
+        // Fora do grupo /api: a consulta de entrega e a área do administrador não passam pelo cache do site.
+        app.MapearEntrega();
+
         app.MapGroup("/api/admin")
             .WithTags("Área do administrador")
             .AddEndpointFilter(ExigirCabecalhoDoAdministrador)

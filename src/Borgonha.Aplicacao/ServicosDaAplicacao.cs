@@ -1,6 +1,7 @@
 using Borgonha.Aplicacao.Administracao;
 using Borgonha.Aplicacao.Catalogo;
 using Borgonha.Aplicacao.Duvidas;
+using Borgonha.Aplicacao.Entrega;
 using Borgonha.Aplicacao.Lojas;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,8 @@ public static class ServicosDaAplicacao
         services.AddScoped<ObterProduto>();
         services.AddScoped<ObterLoja>();
         services.AddScoped<ListarDuvidas>();
+        services.AddScoped<BuscarEnderecosDeEntrega>();
+        services.AddScoped<ConferirEntrega>();
 
         services.AddScoped<ListarCardapioAdmin>();
         services.AddScoped<CriarProduto>();
