@@ -226,7 +226,7 @@ internal static class DadosIniciais
             1),
         Duvida.Criar(
             "Tem pedido mínimo para entrega?",
-            "Depende da distância. Até 1,5 km da loja, em linha reta, não tem pedido mínimo. Mais longe que isso, o pedido mínimo é de R$ 30. Na seção “Entrega” você digita sua rua e confere na hora.",
+            "Depende da distância. Até 1,5 km da loja, pelo trajeto de entrega, não tem pedido mínimo. Mais longe que isso, o pedido mínimo é de R$ 30. Na seção “Entrega” você digita seu endereço e confere na hora.",
             2),
         Duvida.Criar(
             "Qual o horário de funcionamento?",
