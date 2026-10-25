@@ -13,7 +13,7 @@ if (args is [GeradorDeHashDeSenha.Comando])
 var builder = WebApplication.CreateBuilder(args);
 
 var conexaoBanco = builder.Configuration.GetConnectionString("Borgonha")
-    ?? throw new InvalidOperationException("Configure a connection string 'Borgonha'.");
+    ?? throw new InvalidOperationException("Configure a connection string 'Borgonha' do PostgreSQL (veja o README).");
 var pastaDasImagens = PastaDaConfiguracao("Armazenamento:PastaDasImagens");
 var pastaDasChaves = PastaDaConfiguracao("Armazenamento:PastaDasChaves");
 

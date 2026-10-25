@@ -5,7 +5,6 @@ using Borgonha.Aplicacao.Lojas;
 using Borgonha.Infraestrutura.Imagens;
 using Borgonha.Infraestrutura.Persistencia;
 using Borgonha.Infraestrutura.Repositorios;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,14 +12,18 @@ namespace Borgonha.Infraestrutura;
 
 public static class ServicosDaInfraestrutura
 {
+    /// <param name="conexaoBanco">Connection string do PostgreSQL.</param>
     /// <param name="pastaDasImagens">Pasta absoluta onde ficam as fotos enviadas pela área do administrador.</param>
     public static IServiceCollection AdicionarInfraestrutura(this IServiceCollection services, string conexaoBanco, string pastaDasImagens)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(conexaoBanco);
         ArgumentException.ThrowIfNullOrWhiteSpace(pastaDasImagens);
 
+        // Tabelas e colunas em snake_case (produtos, categoria_id): no PostgreSQL, nomes com maiúsculas
+        // exigem aspas em toda consulta SQL escrita à mão.
         services.AddDbContext<BorgonhaDbContext>(opcoes => opcoes
-            .UseSqlite(conexaoBanco)
+            .UseNpgsql(conexaoBanco, postgres => postgres.EnableRetryOnFailure())
+            .UseSnakeCaseNamingConvention()
             .UseSeeding(DadosIniciais.Semear)
             .UseAsyncSeeding(DadosIniciais.SemearAsync));
 
@@ -45,23 +48,7 @@ public static class ServicosDaInfraestrutura
         await using (escopo.ConfigureAwait(false))
         {
             var contexto = escopo.ServiceProvider.GetRequiredService<BorgonhaDbContext>();
-            CriarPastaDoArquivo(contexto.Database.GetConnectionString());
             await contexto.Database.MigrateAsync(cancellationToken).ConfigureAwait(false);
-        }
-    }
-
-    private static void CriarPastaDoArquivo(string? conexao)
-    {
-        var configuracao = new SqliteConnectionStringBuilder(conexao);
-        if (configuracao.Mode == SqliteOpenMode.Memory || string.IsNullOrWhiteSpace(configuracao.DataSource))
-        {
-            return;
-        }
-
-        var pasta = Path.GetDirectoryName(Path.GetFullPath(configuracao.DataSource));
-        if (!string.IsNullOrEmpty(pasta))
-        {
-            Directory.CreateDirectory(pasta);
         }
     }
 }

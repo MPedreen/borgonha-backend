@@ -8,12 +8,9 @@ TestResults/
 .idea/
 *.user
 
-# Dados locais da API: banco SQLite, fotos enviadas pelo administrador e chaves que protegem
-# o cookie da sessão (as chaves NUNCA podem ir para o repositório)
+# Dados locais da API: fotos enviadas pelo administrador e chaves que protegem o cookie da sessão
+# (as chaves NUNCA podem ir para o repositório)
 src/Borgonha.Api/dados/
-*.db
-*.db-shm
-*.db-wal
 
 # Senha do PostgreSQL local (docker-compose.yml). O que vai para o Git é só o .env.exemplo
 .env

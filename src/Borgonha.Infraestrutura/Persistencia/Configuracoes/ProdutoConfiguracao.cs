@@ -9,7 +9,7 @@ internal sealed class ProdutoConfiguracao : IEntityTypeConfiguration<Produto>
 {
     public void Configure(EntityTypeBuilder<Produto> builder)
     {
-        builder.ToTable("Produtos");
+        builder.ToTable("produtos");
         builder.HasKey(produto => produto.Id);
 
         builder.Property(produto => produto.Slug).HasConversion<ConversorSlug>().HasMaxLength(Slug.TamanhoMaximo);
@@ -24,8 +24,8 @@ internal sealed class ProdutoConfiguracao : IEntityTypeConfiguration<Produto>
         builder.PrimitiveCollection(produto => produto.Variacoes);
         builder.Ignore(produto => produto.Situacao);
 
-        builder.OwnsOne(produto => produto.ImagemInteiro, imagem => ConfigurarImagem(imagem, "ImagemInteiro"));
-        builder.OwnsOne(produto => produto.ImagemPartido, imagem => ConfigurarImagem(imagem, "ImagemPartido"));
+        builder.OwnsOne(produto => produto.ImagemInteiro, imagem => ConfigurarImagem(imagem, "imagem_inteiro"));
+        builder.OwnsOne(produto => produto.ImagemPartido, imagem => ConfigurarImagem(imagem, "imagem_partido"));
 
         builder.HasOne(produto => produto.Categoria)
             .WithMany(categoria => categoria.Produtos)
@@ -35,10 +35,10 @@ internal sealed class ProdutoConfiguracao : IEntityTypeConfiguration<Produto>
     private static void ConfigurarImagem(OwnedNavigationBuilder<Produto, Imagem> imagem, string prefixoColuna)
     {
         imagem.Property(foto => foto.Caminho)
-            .HasColumnName($"{prefixoColuna}Caminho")
+            .HasColumnName($"{prefixoColuna}_caminho")
             .HasMaxLength(Imagem.TamanhoMaximoCaminho);
         imagem.Property(foto => foto.TextoAlternativo)
-            .HasColumnName($"{prefixoColuna}TextoAlternativo")
+            .HasColumnName($"{prefixoColuna}_texto_alternativo")
             .HasMaxLength(Imagem.TamanhoMaximoTextoAlternativo);
     }
 }

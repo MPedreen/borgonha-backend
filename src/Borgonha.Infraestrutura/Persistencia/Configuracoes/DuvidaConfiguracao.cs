@@ -8,7 +8,7 @@ internal sealed class DuvidaConfiguracao : IEntityTypeConfiguration<Duvida>
 {
     public void Configure(EntityTypeBuilder<Duvida> builder)
     {
-        builder.ToTable("Duvidas");
+        builder.ToTable("duvidas");
         builder.HasKey(duvida => duvida.Id);
 
         builder.Property(duvida => duvida.Pergunta).HasMaxLength(Duvida.TamanhoMaximoPergunta);

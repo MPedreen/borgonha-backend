@@ -1,15 +1,14 @@
 using Borgonha.Api.Administracao;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.Sqlite;
 
 namespace Borgonha.Api.Tests;
 
 /// <summary>
-/// Sobe a API inteira em memória, com um banco SQLite em memória criado pelas migrations e pelos dados iniciais,
+/// Sobe a API inteira em memória, com um banco PostgreSQL só dela (criado pelas migrations e pelos dados iniciais),
 /// pastas temporárias para fotos e chaves e uma credencial de administrador só para os testes.
 /// </summary>
-public class BorgonhaApiFactory : WebApplicationFactory<Program>
+public class BorgonhaApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     public const string OrigemDoSite = "https://www.borgonha.test";
     public const string UsuarioAdmin = "dona-da-loja";
@@ -17,16 +16,8 @@ public class BorgonhaApiFactory : WebApplicationFactory<Program>
 
     private static readonly Lazy<string> HashDaSenhaAdmin = new(() => HashDeSenha.Gerar(SenhaAdmin));
 
-    private readonly string _conexao = $"Data Source=borgonha-testes-{Guid.NewGuid():N};Mode=Memory;Cache=Shared";
     private readonly string _pastaTemporaria = Path.Combine(Path.GetTempPath(), $"borgonha-testes-{Guid.NewGuid():N}");
-    private readonly SqliteConnection _conexaoMantida;
-
-    public BorgonhaApiFactory()
-    {
-        // O banco em memória existe enquanto houver uma conexão aberta com ele.
-        _conexaoMantida = new SqliteConnection(_conexao);
-        _conexaoMantida.Open();
-    }
+    private string _conexao = string.Empty;
 
     public string PastaDasImagens => Path.Combine(_pastaTemporaria, "imagens");
 
@@ -36,6 +27,8 @@ public class BorgonhaApiFactory : WebApplicationFactory<Program>
     /// <summary>Cliente HTTPS (o cookie da sessão só trafega por HTTPS fora do desenvolvimento).</summary>
     public HttpClient CriarClienteHttps() =>
         CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") });
+
+    public async ValueTask InitializeAsync() => _conexao = await ServidorDePostgres.NovaConexaoAsync().ConfigureAwait(false);
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -54,14 +47,9 @@ public class BorgonhaApiFactory : WebApplicationFactory<Program>
     {
         base.Dispose(disposing);
 
-        if (disposing)
+        if (disposing && Directory.Exists(_pastaTemporaria))
         {
-            _conexaoMantida.Dispose();
-
-            if (Directory.Exists(_pastaTemporaria))
-            {
-                Directory.Delete(_pastaTemporaria, recursive: true);
-            }
+            Directory.Delete(_pastaTemporaria, recursive: true);
         }
     }
 }

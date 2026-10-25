@@ -11,7 +11,7 @@ internal sealed class LojaConfiguracao : IEntityTypeConfiguration<Loja>
 
     public void Configure(EntityTypeBuilder<Loja> builder)
     {
-        builder.ToTable("Lojas");
+        builder.ToTable("lojas");
         builder.HasKey(loja => loja.Id);
 
         builder.Property(loja => loja.Nome).HasMaxLength(Loja.TamanhoMaximoNome);
@@ -21,25 +21,25 @@ internal sealed class LojaConfiguracao : IEntityTypeConfiguration<Loja>
 
         builder.OwnsOne(loja => loja.Endereco, endereco =>
         {
-            endereco.Property(e => e.Logradouro).HasColumnName("Logradouro").HasMaxLength(Endereco.TamanhoMaximoLogradouro);
-            endereco.Property(e => e.Numero).HasColumnName("Numero").HasMaxLength(Endereco.TamanhoMaximoNumero);
-            endereco.Property(e => e.Bairro).HasColumnName("Bairro").HasMaxLength(Endereco.TamanhoMaximoBairro);
-            endereco.Property(e => e.Cidade).HasColumnName("Cidade").HasMaxLength(Endereco.TamanhoMaximoCidade);
-            endereco.Property(e => e.Uf).HasColumnName("Uf").HasMaxLength(2);
-            endereco.Property(e => e.Cep).HasColumnName("Cep").HasMaxLength(9);
+            endereco.Property(e => e.Logradouro).HasColumnName("logradouro").HasMaxLength(Endereco.TamanhoMaximoLogradouro);
+            endereco.Property(e => e.Numero).HasColumnName("numero").HasMaxLength(Endereco.TamanhoMaximoNumero);
+            endereco.Property(e => e.Bairro).HasColumnName("bairro").HasMaxLength(Endereco.TamanhoMaximoBairro);
+            endereco.Property(e => e.Cidade).HasColumnName("cidade").HasMaxLength(Endereco.TamanhoMaximoCidade);
+            endereco.Property(e => e.Uf).HasColumnName("uf").HasMaxLength(2);
+            endereco.Property(e => e.Cep).HasColumnName("cep").HasMaxLength(9);
         });
         builder.Navigation(loja => loja.Endereco).IsRequired();
 
         builder.OwnsOne(loja => loja.Coordenadas, coordenadas =>
         {
-            coordenadas.Property(c => c.Latitude).HasColumnName("Latitude");
-            coordenadas.Property(c => c.Longitude).HasColumnName("Longitude");
+            coordenadas.Property(c => c.Latitude).HasColumnName("latitude");
+            coordenadas.Property(c => c.Longitude).HasColumnName("longitude");
         });
         builder.Navigation(loja => loja.Coordenadas).IsRequired();
 
         builder.OwnsMany(loja => loja.Horarios, horario =>
         {
-            horario.ToTable("HorariosFuncionamento");
+            horario.ToTable("horarios_funcionamento");
             horario.WithOwner().HasForeignKey("LojaId");
             horario.Property<int>("Id");
             horario.HasKey("Id");
@@ -49,7 +49,7 @@ internal sealed class LojaConfiguracao : IEntityTypeConfiguration<Loja>
 
         builder.OwnsMany(loja => loja.CanaisPedido, canal =>
         {
-            canal.ToTable("CanaisPedido");
+            canal.ToTable("canais_pedido");
             canal.WithOwner().HasForeignKey("LojaId");
             canal.Property<int>("Id");
             canal.HasKey("Id");

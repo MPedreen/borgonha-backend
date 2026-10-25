@@ -9,7 +9,7 @@ internal sealed class CategoriaConfiguracao : IEntityTypeConfiguration<Categoria
 {
     public void Configure(EntityTypeBuilder<Categoria> builder)
     {
-        builder.ToTable("Categorias");
+        builder.ToTable("categorias");
         builder.HasKey(categoria => categoria.Id);
 
         builder.Property(categoria => categoria.Slug).HasConversion<ConversorSlug>().HasMaxLength(Slug.TamanhoMaximo);

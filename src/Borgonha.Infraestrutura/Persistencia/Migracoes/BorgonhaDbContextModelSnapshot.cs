@@ -4,6 +4,7 @@ using Borgonha.Infraestrutura.Persistencia;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -15,148 +16,193 @@ namespace Borgonha.Infraestrutura.Persistencia.Migracoes
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.13");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "10.0.13")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Borgonha.Dominio.Catalogo.Categoria", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(40)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(40)")
+                        .HasColumnName("nome");
 
                     b.Property<int>("Ordem")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("ordem");
 
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(60)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("slug");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_categorias");
 
                     b.HasIndex("Slug")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_categorias_slug");
 
-                    b.ToTable("Categorias", (string)null);
+                    b.ToTable("categorias", (string)null);
                 });
 
             modelBuilder.Entity("Borgonha.Dominio.Catalogo.Produto", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Ativo")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean")
+                        .HasColumnName("ativo");
 
                     b.Property<int>("CategoriaId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("categoria_id");
 
                     b.Property<string>("Descricao")
                         .HasMaxLength(400)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(400)")
+                        .HasColumnName("descricao");
 
                     b.Property<bool>("Disponivel")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean")
+                        .HasColumnName("disponivel");
 
                     b.Property<string>("Frase")
                         .HasMaxLength(120)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(120)")
+                        .HasColumnName("frase");
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(80)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(80)")
+                        .HasColumnName("nome");
 
                     b.Property<int>("Ordem")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("ordem");
 
                     b.Property<string>("Peso")
                         .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("peso");
 
                     b.Property<decimal?>("Preco")
                         .HasPrecision(10, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric(10,2)")
+                        .HasColumnName("preco");
 
                     b.Property<string>("Selo")
                         .HasMaxLength(24)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(24)")
+                        .HasColumnName("selo");
 
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(60)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("slug");
 
-                    b.PrimitiveCollection<string>("Variacoes")
+                    b.PrimitiveCollection<string[]>("Variacoes")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text[]")
+                        .HasColumnName("variacoes");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_produtos");
 
-                    b.HasIndex("CategoriaId");
+                    b.HasIndex("CategoriaId")
+                        .HasDatabaseName("ix_produtos_categoria_id");
 
                     b.HasIndex("Slug")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_produtos_slug");
 
-                    b.ToTable("Produtos", (string)null);
+                    b.ToTable("produtos", (string)null);
                 });
 
             modelBuilder.Entity("Borgonha.Dominio.Duvidas.Duvida", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Ordem")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("ordem");
 
                     b.Property<string>("Pergunta")
                         .IsRequired()
                         .HasMaxLength(160)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(160)")
+                        .HasColumnName("pergunta");
 
                     b.Property<string>("Resposta")
                         .IsRequired()
                         .HasMaxLength(600)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(600)")
+                        .HasColumnName("resposta");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_duvidas");
 
-                    b.ToTable("Duvidas", (string)null);
+                    b.ToTable("duvidas", (string)null);
                 });
 
             modelBuilder.Entity("Borgonha.Dominio.Lojas.Loja", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AvisoTopo")
                         .HasMaxLength(140)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(140)")
+                        .HasColumnName("aviso_topo");
 
                     b.Property<string>("Instagram")
                         .HasMaxLength(30)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(30)")
+                        .HasColumnName("instagram");
 
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(80)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(80)")
+                        .HasColumnName("nome");
 
                     b.Property<string>("Telefone")
                         .IsRequired()
                         .HasMaxLength(16)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("character varying(16)")
+                        .HasColumnName("telefone");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_lojas");
 
-                    b.ToTable("Lojas", (string)null);
+                    b.ToTable("lojas", (string)null);
                 });
 
             modelBuilder.Entity("Borgonha.Dominio.Catalogo.Produto", b =>
@@ -165,56 +211,61 @@ namespace Borgonha.Infraestrutura.Persistencia.Migracoes
                         .WithMany("Produtos")
                         .HasForeignKey("CategoriaId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_produtos_categorias_categoria_id");
 
                     b.OwnsOne("Borgonha.Dominio.Comum.Imagem", "ImagemInteiro", b1 =>
                         {
                             b1.Property<int>("ProdutoId")
-                                .HasColumnType("INTEGER");
+                                .HasColumnType("integer")
+                                .HasColumnName("id");
 
                             b1.Property<string>("Caminho")
                                 .IsRequired()
                                 .HasMaxLength(120)
-                                .HasColumnType("TEXT")
-                                .HasColumnName("ImagemInteiroCaminho");
+                                .HasColumnType("character varying(120)")
+                                .HasColumnName("imagem_inteiro_caminho");
 
                             b1.Property<string>("TextoAlternativo")
                                 .IsRequired()
                                 .HasMaxLength(200)
-                                .HasColumnType("TEXT")
-                                .HasColumnName("ImagemInteiroTextoAlternativo");
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("imagem_inteiro_texto_alternativo");
 
                             b1.HasKey("ProdutoId");
 
-                            b1.ToTable("Produtos");
+                            b1.ToTable("produtos");
 
                             b1.WithOwner()
-                                .HasForeignKey("ProdutoId");
+                                .HasForeignKey("ProdutoId")
+                                .HasConstraintName("fk_produtos_produtos_id");
                         });
 
                     b.OwnsOne("Borgonha.Dominio.Comum.Imagem", "ImagemPartido", b1 =>
                         {
                             b1.Property<int>("ProdutoId")
-                                .HasColumnType("INTEGER");
+                                .HasColumnType("integer")
+                                .HasColumnName("id");
 
                             b1.Property<string>("Caminho")
                                 .IsRequired()
                                 .HasMaxLength(120)
-                                .HasColumnType("TEXT")
-                                .HasColumnName("ImagemPartidoCaminho");
+                                .HasColumnType("character varying(120)")
+                                .HasColumnName("imagem_partido_caminho");
 
                             b1.Property<string>("TextoAlternativo")
                                 .IsRequired()
                                 .HasMaxLength(200)
-                                .HasColumnType("TEXT")
-                                .HasColumnName("ImagemPartidoTextoAlternativo");
+                                .HasColumnType("character varying(200)")
+                                .HasColumnName("imagem_partido_texto_alternativo");
 
                             b1.HasKey("ProdutoId");
 
-                            b1.ToTable("Produtos");
+                            b1.ToTable("produtos");
 
                             b1.WithOwner()
-                                .HasForeignKey("ProdutoId");
+                                .HasForeignKey("ProdutoId")
+                                .HasConstraintName("fk_produtos_produtos_id");
                         });
 
                     b.Navigation("Categoria");
@@ -230,157 +281,187 @@ namespace Borgonha.Infraestrutura.Persistencia.Migracoes
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("INTEGER");
+                                .HasColumnType("integer")
+                                .HasColumnName("id");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
 
                             b1.Property<string>("Descricao")
                                 .IsRequired()
                                 .HasMaxLength(160)
-                                .HasColumnType("TEXT");
+                                .HasColumnType("character varying(160)")
+                                .HasColumnName("descricao");
 
                             b1.Property<bool>("Destaque")
-                                .HasColumnType("INTEGER");
+                                .HasColumnType("boolean")
+                                .HasColumnName("destaque");
 
                             b1.Property<int>("LojaId")
-                                .HasColumnType("INTEGER");
+                                .HasColumnType("integer")
+                                .HasColumnName("loja_id");
 
                             b1.Property<string>("MensagemPadrao")
                                 .HasMaxLength(300)
-                                .HasColumnType("TEXT");
+                                .HasColumnType("character varying(300)")
+                                .HasColumnName("mensagem_padrao");
 
                             b1.Property<int>("Ordem")
-                                .HasColumnType("INTEGER");
+                                .HasColumnType("integer")
+                                .HasColumnName("ordem");
 
                             b1.Property<string>("Selo")
                                 .HasMaxLength(24)
-                                .HasColumnType("TEXT");
+                                .HasColumnType("character varying(24)")
+                                .HasColumnName("selo");
 
                             b1.Property<string>("Tipo")
                                 .IsRequired()
                                 .HasMaxLength(20)
-                                .HasColumnType("TEXT");
+                                .HasColumnType("character varying(20)")
+                                .HasColumnName("tipo");
 
                             b1.Property<string>("Titulo")
                                 .IsRequired()
                                 .HasMaxLength(60)
-                                .HasColumnType("TEXT");
+                                .HasColumnType("character varying(60)")
+                                .HasColumnName("titulo");
 
                             b1.Property<string>("Url")
                                 .IsRequired()
                                 .HasMaxLength(500)
-                                .HasColumnType("TEXT");
+                                .HasColumnType("character varying(500)")
+                                .HasColumnName("url");
 
-                            b1.HasKey("Id");
+                            b1.HasKey("Id")
+                                .HasName("pk_canais_pedido");
 
-                            b1.HasIndex("LojaId");
+                            b1.HasIndex("LojaId")
+                                .HasDatabaseName("ix_canais_pedido_loja_id");
 
-                            b1.ToTable("CanaisPedido", (string)null);
+                            b1.ToTable("canais_pedido", (string)null);
 
                             b1.WithOwner()
-                                .HasForeignKey("LojaId");
+                                .HasForeignKey("LojaId")
+                                .HasConstraintName("fk_canais_pedido_lojas_loja_id");
                         });
 
                     b.OwnsOne("Borgonha.Dominio.Lojas.Coordenadas", "Coordenadas", b1 =>
                         {
                             b1.Property<int>("LojaId")
-                                .HasColumnType("INTEGER");
+                                .HasColumnType("integer")
+                                .HasColumnName("id");
 
                             b1.Property<double>("Latitude")
-                                .HasColumnType("REAL")
-                                .HasColumnName("Latitude");
+                                .HasColumnType("double precision")
+                                .HasColumnName("latitude");
 
                             b1.Property<double>("Longitude")
-                                .HasColumnType("REAL")
-                                .HasColumnName("Longitude");
+                                .HasColumnType("double precision")
+                                .HasColumnName("longitude");
 
                             b1.HasKey("LojaId");
 
-                            b1.ToTable("Lojas");
+                            b1.ToTable("lojas");
 
                             b1.WithOwner()
-                                .HasForeignKey("LojaId");
+                                .HasForeignKey("LojaId")
+                                .HasConstraintName("fk_lojas_lojas_id");
                         });
 
                     b.OwnsOne("Borgonha.Dominio.Lojas.Endereco", "Endereco", b1 =>
                         {
                             b1.Property<int>("LojaId")
-                                .HasColumnType("INTEGER");
+                                .HasColumnType("integer")
+                                .HasColumnName("id");
 
                             b1.Property<string>("Bairro")
                                 .IsRequired()
                                 .HasMaxLength(60)
-                                .HasColumnType("TEXT")
-                                .HasColumnName("Bairro");
+                                .HasColumnType("character varying(60)")
+                                .HasColumnName("bairro");
 
                             b1.Property<string>("Cep")
                                 .HasMaxLength(9)
-                                .HasColumnType("TEXT")
-                                .HasColumnName("Cep");
+                                .HasColumnType("character varying(9)")
+                                .HasColumnName("cep");
 
                             b1.Property<string>("Cidade")
                                 .IsRequired()
                                 .HasMaxLength(60)
-                                .HasColumnType("TEXT")
-                                .HasColumnName("Cidade");
+                                .HasColumnType("character varying(60)")
+                                .HasColumnName("cidade");
 
                             b1.Property<string>("Logradouro")
                                 .IsRequired()
                                 .HasMaxLength(120)
-                                .HasColumnType("TEXT")
-                                .HasColumnName("Logradouro");
+                                .HasColumnType("character varying(120)")
+                                .HasColumnName("logradouro");
 
                             b1.Property<string>("Numero")
                                 .IsRequired()
                                 .HasMaxLength(10)
-                                .HasColumnType("TEXT")
-                                .HasColumnName("Numero");
+                                .HasColumnType("character varying(10)")
+                                .HasColumnName("numero");
 
                             b1.Property<string>("Uf")
                                 .IsRequired()
                                 .HasMaxLength(2)
-                                .HasColumnType("TEXT")
-                                .HasColumnName("Uf");
+                                .HasColumnType("character varying(2)")
+                                .HasColumnName("uf");
 
                             b1.HasKey("LojaId");
 
-                            b1.ToTable("Lojas");
+                            b1.ToTable("lojas");
 
                             b1.WithOwner()
-                                .HasForeignKey("LojaId");
+                                .HasForeignKey("LojaId")
+                                .HasConstraintName("fk_lojas_lojas_id");
                         });
 
                     b.OwnsMany("Borgonha.Dominio.Lojas.HorarioFuncionamento", "Horarios", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
-                                .HasColumnType("INTEGER");
+                                .HasColumnType("integer")
+                                .HasColumnName("id");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
 
                             b1.Property<TimeOnly>("Abertura")
-                                .HasColumnType("TEXT");
+                                .HasColumnType("time without time zone")
+                                .HasColumnName("abertura");
 
                             b1.Property<string>("DiaFinal")
                                 .IsRequired()
                                 .HasMaxLength(10)
-                                .HasColumnType("TEXT");
+                                .HasColumnType("character varying(10)")
+                                .HasColumnName("dia_final");
 
                             b1.Property<string>("DiaInicial")
                                 .IsRequired()
                                 .HasMaxLength(10)
-                                .HasColumnType("TEXT");
+                                .HasColumnType("character varying(10)")
+                                .HasColumnName("dia_inicial");
 
                             b1.Property<TimeOnly>("Fechamento")
-                                .HasColumnType("TEXT");
+                                .HasColumnType("time without time zone")
+                                .HasColumnName("fechamento");
 
                             b1.Property<int>("LojaId")
-                                .HasColumnType("INTEGER");
+                                .HasColumnType("integer")
+                                .HasColumnName("loja_id");
 
-                            b1.HasKey("Id");
+                            b1.HasKey("Id")
+                                .HasName("pk_horarios_funcionamento");
 
-                            b1.HasIndex("LojaId");
+                            b1.HasIndex("LojaId")
+                                .HasDatabaseName("ix_horarios_funcionamento_loja_id");
 
-                            b1.ToTable("HorariosFuncionamento", (string)null);
+                            b1.ToTable("horarios_funcionamento", (string)null);
 
                             b1.WithOwner()
-                                .HasForeignKey("LojaId");
+                                .HasForeignKey("LojaId")
+                                .HasConstraintName("fk_horarios_funcionamento_lojas_loja_id");
                         });
 
                     b.Navigation("CanaisPedido");
