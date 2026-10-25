@@ -50,6 +50,16 @@ public sealed class LojaEndpointsTests(BorgonhaApiFactory fabrica) : IClassFixtu
             });
     }
 
+    [Fact]
+    public async Task RetornaARegraDoPedidoMinimoDaEntrega()
+    {
+        var loja = await ObterLojaAsync();
+
+        Assert.NotNull(loja.Entrega);
+        Assert.Equal(1_500, loja.Entrega.RaioSemPedidoMinimoEmMetros);
+        Assert.Equal(30m, loja.Entrega.PedidoMinimo);
+    }
+
     private async Task<LojaDto> ObterLojaAsync()
     {
         var loja = await _cliente.GetFromJsonAsync<LojaDto>("/api/loja", TestContext.Current.CancellationToken);

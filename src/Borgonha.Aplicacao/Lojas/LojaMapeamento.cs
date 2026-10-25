@@ -19,6 +19,7 @@ internal static class LojaMapeamento
             loja.Telefone,
             loja.Instagram,
             loja.AvisoTopo,
+            loja.Entrega is { } entrega ? new EntregaDto(entrega.RaioSemPedidoMinimoEmMetros, entrega.PedidoMinimo) : null,
             [.. loja.Horarios.OrderBy(horario => horario.DiaInicial).Select(ParaDto)],
             [.. loja.CanaisPedido.OrderBy(canal => canal.Ordem).Select(ParaDto)]);
 

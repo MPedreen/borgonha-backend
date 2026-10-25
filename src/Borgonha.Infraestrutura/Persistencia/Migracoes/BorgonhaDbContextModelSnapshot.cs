@@ -464,6 +464,30 @@ namespace Borgonha.Infraestrutura.Persistencia.Migracoes
                                 .HasConstraintName("fk_horarios_funcionamento_lojas_loja_id");
                         });
 
+                    b.OwnsOne("Borgonha.Dominio.Lojas.RegraDeEntrega", "Entrega", b1 =>
+                        {
+                            b1.Property<int>("LojaId")
+                                .HasColumnType("integer")
+                                .HasColumnName("id");
+
+                            b1.Property<decimal>("PedidoMinimo")
+                                .HasPrecision(10, 2)
+                                .HasColumnType("numeric(10,2)")
+                                .HasColumnName("entrega_pedido_minimo");
+
+                            b1.Property<int>("RaioSemPedidoMinimoEmMetros")
+                                .HasColumnType("integer")
+                                .HasColumnName("entrega_raio_sem_pedido_minimo_em_metros");
+
+                            b1.HasKey("LojaId");
+
+                            b1.ToTable("lojas");
+
+                            b1.WithOwner()
+                                .HasForeignKey("LojaId")
+                                .HasConstraintName("fk_lojas_lojas_id");
+                        });
+
                     b.Navigation("CanaisPedido");
 
                     b.Navigation("Coordenadas")
@@ -471,6 +495,8 @@ namespace Borgonha.Infraestrutura.Persistencia.Migracoes
 
                     b.Navigation("Endereco")
                         .IsRequired();
+
+                    b.Navigation("Entrega");
 
                     b.Navigation("Horarios");
                 });

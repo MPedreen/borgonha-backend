@@ -185,6 +185,8 @@ internal static class DadosIniciais
             instagram: "borgonhaconfeitaria",
             avisoTopo: "Frete grátis em Santa Luzia e região pedindo pelo WhatsApp");
 
+        loja.DefinirEntrega(new RegraDeEntrega(raioSemPedidoMinimoEmMetros: 1_500, pedidoMinimo: 30m));
+
         loja.AdicionarHorario(new HorarioFuncionamento(DayOfWeek.Tuesday, DayOfWeek.Friday, new TimeOnly(11, 0), new TimeOnly(19, 0)));
         loja.AdicionarHorario(new HorarioFuncionamento(DayOfWeek.Saturday, DayOfWeek.Saturday, new TimeOnly(11, 0), new TimeOnly(16, 0)));
 
@@ -223,12 +225,16 @@ internal static class DadosIniciais
             "Sim! Pedindo pelo WhatsApp, a entrega é grátis em Santa Luzia e região.",
             1),
         Duvida.Criar(
+            "Tem pedido mínimo para entrega?",
+            "Depende da distância. Até 1,5 km da loja, em linha reta, não tem pedido mínimo. Mais longe que isso, o pedido mínimo é de R$ 30. Na seção “Entrega” você digita sua rua e confere na hora.",
+            2),
+        Duvida.Criar(
             "Qual o horário de funcionamento?",
             "De terça a sexta, das 11h às 19h, e aos sábados, das 11h às 16h.",
-            2),
+            3),
         Duvida.Criar(
             "Onde fica a loja?",
             "Na Rua Afrânio Peixoto, 40 – Santa Luzia, São Gonçalo – RJ.",
-            3),
+            4),
     ];
 }

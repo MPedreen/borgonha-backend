@@ -13,8 +13,9 @@ public sealed class DuvidasEndpointsTests(BorgonhaApiFactory fabrica) : IClassFi
         var duvidas = await _cliente.GetFromJsonAsync<List<DuvidaDto>>("/api/duvidas", TestContext.Current.CancellationToken);
 
         Assert.NotNull(duvidas);
-        Assert.Equal(4, duvidas.Count);
+        Assert.Equal(5, duvidas.Count);
         Assert.Equal("Como faço meu pedido?", duvidas[0].Pergunta);
+        Assert.Equal("Tem pedido mínimo para entrega?", duvidas[2].Pergunta);
         Assert.All(duvidas, duvida => Assert.False(string.IsNullOrWhiteSpace(duvida.Resposta)));
     }
 }

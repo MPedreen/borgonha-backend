@@ -7,12 +7,17 @@ public sealed record LojaDto(
     string Telefone,
     string? Instagram,
     string? AvisoTopo,
+    EntregaDto? Entrega,
     IReadOnlyList<HorarioDto> Horarios,
     IReadOnlyList<CanalPedidoDto> CanaisPedido);
 
 public sealed record EnderecoDto(string Logradouro, string Numero, string Bairro, string Cidade, string Uf, string? Cep);
 
 public sealed record CoordenadasDto(double Latitude, double Longitude);
+
+/// <param name="RaioSemPedidoMinimoEmMetros">Até essa distância da loja, em linha reta, não há pedido mínimo.</param>
+/// <param name="PedidoMinimo">Valor mínimo do pedido, em reais, para endereços mais distantes.</param>
+public sealed record EntregaDto(int RaioSemPedidoMinimoEmMetros, decimal PedidoMinimo);
 
 /// <param name="Dias">Dias da semana em inglês e minúsculas ("tuesday"), o formato usado pelo schema.org.</param>
 /// <param name="Abertura">Horário no formato HH:mm.</param>

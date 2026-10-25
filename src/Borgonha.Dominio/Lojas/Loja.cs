@@ -43,6 +43,11 @@ public sealed partial class Loja
     /// </summary>
     public string? AvisoTopo { get; private set; }
 
+    /// <summary>
+    /// Pedido mínimo da entrega conforme a distância. Sem regra, o site não oferece a consulta de endereço.
+    /// </summary>
+    public RegraDeEntrega? Entrega { get; private set; }
+
     public IReadOnlyList<HorarioFuncionamento> Horarios => _horarios.AsReadOnly();
 
     public IReadOnlyList<CanalPedido> CanaisPedido => _canaisPedido.AsReadOnly();
@@ -80,6 +85,8 @@ public sealed partial class Loja
             AvisoTopo = Garantir.TextoOpcional(avisoTopo, "Aviso do topo", TamanhoMaximoAvisoTopo),
         };
     }
+
+    public void DefinirEntrega(RegraDeEntrega? regra) => Entrega = regra;
 
     public void AdicionarHorario(HorarioFuncionamento horario)
     {

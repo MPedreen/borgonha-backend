@@ -37,6 +37,12 @@ internal sealed class LojaConfiguracao : IEntityTypeConfiguration<Loja>
         });
         builder.Navigation(loja => loja.Coordenadas).IsRequired();
 
+        builder.OwnsOne(loja => loja.Entrega, entrega =>
+        {
+            entrega.Property(e => e.RaioSemPedidoMinimoEmMetros);
+            entrega.Property(e => e.PedidoMinimo).HasPrecision(10, 2);
+        });
+
         builder.OwnsMany(loja => loja.Horarios, horario =>
         {
             horario.ToTable("horarios_funcionamento");
