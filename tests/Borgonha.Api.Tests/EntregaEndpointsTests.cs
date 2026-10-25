@@ -101,13 +101,14 @@ public sealed class EntregaEndpointsTests(BorgonhaApiFactory fabrica) : IClassFi
     }
 
     [Fact]
-    public async Task EnderecoAlemDoAlcanceDaConsultaPedeConfirmacaoPeloWhatsApp()
+    public async Task EnderecoMuitoLongeTambemTemPedidoMinimoSemLimiteDeDistancia()
     {
         fabrica.Mapas.Reiniciar();
 
-        var resultado = await ConferirAsync(AoSul(6_000));
+        var resultado = await ConferirAsync(AoSul(30_000));
 
-        Assert.Equal("fora-da-regiao", resultado.Situacao);
+        Assert.Equal("com-minimo", resultado.Situacao);
+        Assert.Null(resultado.DistanciaEmMetros);
         Assert.Equal(0, fabrica.Mapas.Trajetos);
     }
 

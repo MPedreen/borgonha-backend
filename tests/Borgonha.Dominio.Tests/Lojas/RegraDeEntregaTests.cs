@@ -40,7 +40,7 @@ public sealed class RegraDeEntregaTests
     [InlineData(1_750, null)]
     [InlineData(1_751, SituacaoDaEntrega.ComPedidoMinimo)]
     [InlineData(5_000, SituacaoDaEntrega.ComPedidoMinimo)]
-    [InlineData(5_001, SituacaoDaEntrega.ForaDoAlcance)]
+    [InlineData(40_000, SituacaoDaEntrega.ComPedidoMinimo)]
     public void LinhaRetaDecideSoQuandoJaBasta(int distancia, SituacaoDaEntrega? esperada)
     {
         var regra = new RegraDeEntrega(1_500, 30m);
