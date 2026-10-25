@@ -42,7 +42,7 @@ Todos são `GET` e respondem JSON. As rotas ficam 5 minutos em cache, e qualquer
 |---|---|
 | `/api/catalogo` | Cardápio do dia, agrupado por categoria (cookies, doces e salgados). Produtos ocultos ficam de fora |
 | `/api/catalogo/{slug}` | Um produto; 404 em ProblemDetails se não existir ou estiver oculto |
-| `/api/loja` | Endereço, horários, Instagram e canais de pedido (WhatsApp, iFood e loja física) |
+| `/api/loja` | Endereço, horários, Instagram, canais de pedido (WhatsApp, iFood e loja física) e a regra de entrega (`entrega`: raio sem pedido mínimo, em metros, e o valor do pedido mínimo) |
 | `/api/duvidas` | Perguntas frequentes |
 | `/api/imagens/envios/{arquivo}.webp` | Fotos enviadas pela área do administrador |
 | `/health` | Saúde da API e do banco |
@@ -89,6 +89,16 @@ Outras proteções:
 - **Força bruta:** no máximo 5 tentativas de login a cada 15 minutos por endereço IP e 20 por hora no total. Usuário e senha são conferidos em tempo constante, e a resposta de erro é a mesma para usuário ou senha errados. Atrás de um proxy reverso, configure os cabeçalhos `X-Forwarded-For` para o limite por IP enxergar o endereço real.
 - **CSRF:** além do `SameSite=Strict`, toda chamada exige o cabeçalho `X-Borgonha-Admin`, que outros sites não conseguem enviar (o CORS só libera as origens configuradas).
 - **Fotos:** a API abre e regrava cada foto em WebP. Arquivos que não são imagem são recusados, e metadados como a localização do celular não chegam ao site.
+
+### Regra de entrega
+
+Até 1,5 km da loja, em linha reta, a entrega não tem pedido mínimo; mais longe, o pedido mínimo é de R$ 30. Os valores ficam na tabela `lojas` e ainda não têm tela na área do administrador. Para mudar:
+
+```sql
+UPDATE lojas SET entrega_raio_sem_pedido_minimo_em_metros = 1500, entrega_pedido_minimo = 30;
+```
+
+Depois, atualize a dúvida "Tem pedido mínimo para entrega?" (tabela `duvidas`) e gere de novo a lista de ruas do site (`npm run ruas-entrega` no frontend).
 
 ### Pasta `dados/`
 
