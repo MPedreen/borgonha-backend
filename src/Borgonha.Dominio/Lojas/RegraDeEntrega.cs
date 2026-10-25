@@ -11,6 +11,9 @@ public sealed record RegraDeEntrega
     public const int RaioMaximoEmMetros = 50_000;
     public const decimal PedidoMinimoMaximo = 9_999.99m;
 
+    /// <summary>Até onde a consulta automática responde (em linha reta); mais longe, a confirmação é com a loja.</summary>
+    public const int AlcanceEmMetros = 5_000;
+
     /// <summary>
     /// Folga em volta do raio. Os mapas gratuitos estimam o número da casa ao longo da rua, com erro de
     /// algumas centenas de metros: dentro dessa folga, a resposta seria um palpite.
@@ -44,6 +47,11 @@ public sealed record RegraDeEntrega
     /// <returns>A situação, ou <see langword="null"/> se for preciso calcular o trajeto.</returns>
     public SituacaoDaEntrega? AvaliarPelaLinhaReta(int distanciaEmMetros)
     {
+        if (distanciaEmMetros > AlcanceEmMetros)
+        {
+            return SituacaoDaEntrega.ForaDoAlcance;
+        }
+
         return distanciaEmMetros > RaioSemPedidoMinimoEmMetros + MargemDeIncertezaEmMetros
             ? SituacaoDaEntrega.ComPedidoMinimo
             : null;

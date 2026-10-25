@@ -44,6 +44,7 @@ public sealed class ConferirEntrega(ILojaRepositorio lojas, IRotas rotas)
             SituacaoDaEntrega.SemPedidoMinimo => "sem-minimo",
             SituacaoDaEntrega.ComPedidoMinimo => "com-minimo",
             SituacaoDaEntrega.Incerta => "incerta",
+            SituacaoDaEntrega.ForaDoAlcance => "fora-da-regiao",
             _ => throw new ArgumentOutOfRangeException(nameof(situacao), situacao, "Situação sem representação na API."),
         };
 }
